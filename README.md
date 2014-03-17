@@ -1,2 +1,3 @@
-node-dota2
-==========
+# node-dota2
+
+a [Sails](http://sailsjs.org) application
