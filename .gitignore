@@ -113,4 +113,6 @@ npm-debug.log
 .DS_STORE
 .netbeans
 nbproject
-.idea
+
+
+.idea/dictionaries/Drako.xml
