@@ -45,10 +45,15 @@ var AuthController = {
     });
 
     // Render the `auth/login.ext` view
+    if(res.viewExists){
     res.view({
       providers : providers
     , errors    : req.flash('error')
     });
+    }else {
+       res.redirect("/");
+    }
+
   },
 
   /**
