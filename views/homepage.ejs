@@ -4,15 +4,18 @@
     <h2>Welcome to the Dota2 Stats</h2>
 
     <%if(!req.user){%>
-    <a href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
+    <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
     <%}else{%>
-    <a href="/logout">Log Out</a>
+    <a class="btn btn-success" href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a>
     <p>Steam ID: <%=req.user.steam_id%></p>
-    <img src="<%=req.user.avatarfull%>"/>
+   <div class=""> <img src="<%=req.user.avatarfull%>"/>
+
+   </div>
+    <div class="space"></div>
     <div>
-        <a href="match/personalhistory">My Matches</a>
-        <a href="match/history">All Matches</a>
-        <a href="match/heroes">Heroes</a>
+        <a class="btn-primary btn" href="match/personalhistory">My Matches</a>
+        <a class="btn-primary btn" href="match/history">All Matches</a>
+        <a class="btn-primary btn" href="match/heroes">Heroes</a>
     </div>
     <%}%>
 
