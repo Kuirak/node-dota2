@@ -24,7 +24,7 @@ module.exports.policies = {
     ItemController:{
         '*':true
     }
-   
+
 
   /*
 	// Here's an example of adding some policies to a controller
