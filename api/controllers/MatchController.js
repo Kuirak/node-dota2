@@ -36,7 +36,7 @@ module.exports = {
             var account_id =user.steam_id;
             dota2Api.getMatchHistory({account_id:account_id},function(err,response){
                 if(err) res.send(500);
-                res.render("match/history",{matches:response.matches})
+                res.view("match/history",{matches:response.matches});
             })
         });
 
