@@ -1,21 +1,22 @@
 <div class="container">
 
-   <h1>Hello to the Dota2 Stats</h1>
+   <h1>Hello <%=req.user ? req.user.username :"Feeder"%>,</h1>
+    <h2>Welcome to the Dota2 Stats</h2>
 
-    <%if(!res.locals.user){%>
-    <a href="auth/steam"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
+    <%if(!req.user){%>
+    <a href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
     <%}else{%>
-    <p><%=res.locals.user.steam_id%></p>
-    <img src="<%=res.locals.user.avatarfull%>"/>
+    <a href="/logout">Log Out</a>
+    <p>Steam ID: <%=req.user.steam_id%></p>
+    <img src="<%=req.user.avatarfull%>"/>
+    <div>
+        <a href="match/personalhistory">My Matches</a>
+        <a href="match/history">All Matches</a>
+        <a href="match/heroes">Heroes</a>
+    </div>
     <%}%>
 
-    <a href="match/history">History</a>
-    <a href="match/heroes">Heroes</a>
 
-    <div>
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-    </div>
 
 
 </div>

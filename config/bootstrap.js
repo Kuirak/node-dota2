@@ -10,6 +10,18 @@
 
 module.exports.bootstrap = function (cb) {
 
+   var passport = require('passport')
+
+    passport.serializeUser(function(user, done) {
+        done(null, user.id);
+    });
+
+    passport.deserializeUser(function(id, done) {
+        User.findOne(id).done(function (err, user) {
+            done(err, user);
+        });
+    });
+
   // It's very important to trigger this callack method when you are finished 
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   cb();

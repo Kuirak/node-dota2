@@ -9,14 +9,11 @@ module.exports = {
 
 	attributes: {
         username  : { type: 'string'},
-        passports : { collection: 'Passport', via: 'user' },
+        identifier:{type:'string',unique:true, required:true},
         steam_id:{type:'string',unique:true},
         avatar:'string',
         avatarmedium:'string',
         avatarfull:'string'
-
-
-
 	}
 
 
