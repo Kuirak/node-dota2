@@ -2,6 +2,15 @@
 
    <h1>Hello to the Dota2 Stats</h1>
 
-    <a href="/auth/steam"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
+    <%if(!res.locals.user){%>
+    <a href="auth/steam"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
+    <%}else{%>
+    <p><%=res.locals.user.steam_id%></p>
+    <img src="<%=res.locals.user.avatarfull%>"/>
+    <%}%>
+
+    <a href="match/history">History</a>
+    <a href="match/heroes">Heroes</a>
+
 
 </div>

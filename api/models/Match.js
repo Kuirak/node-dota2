@@ -8,6 +8,10 @@
 module.exports = {
 
 	attributes: {
+        match_id:{type: 'string',unique:true},
+
+
+
 
 
 	}

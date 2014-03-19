@@ -1,6 +1,9 @@
 var passport = require('passport')
   , path     = require('path')
-  , url      = require('url');
+  , url      = require('url')
+    ,steam=require('steam-web'),
+    steamApi = new steam({apiKey:'447623429FF93527982CCAA65604BC41'});
+
 
 /**
  * Passport Service
@@ -72,74 +75,99 @@ passport.connect = function (req, query, profile, next) {
 
   // If the profile object contains a list of emails, grab the first one and
   // add it to the user.
-  if (profile.hasOwnProperty('emails')) {
-    user.email = profile.emails[0].value;
-  }
+//  if (profile.hasOwnProperty('emails')) {
+//    user.email = profile.emails[0].value;
+//  }
   // If the profile object contains a username, add it to the user.
   if (profile.hasOwnProperty('username')) {
     user.username = profile.username;
   }
+  if(query.provider === 'steam'){
+      var steam_id = query.identifier.slice(_.lastIndexOf(query.identifier,'/')+1);
+        steamApi.getPlayerSummaries({
+           steamids:[steam_id],
+           callback:function(err,data){
+               if(err)return next(err);
+               if(data.response.players.length <=0){
+                   return next(new Error("No Player Data found for steam id"))
+               }
+               var player =data.response.players[0];
+               user.username = player.personaname;
+               user.steam_id = player.steamid;
+               user.avatar =player.avatar;
+               user.avatarmedium =player.avatarmedium;
+               user.avatarfull =player.avatarfull;
+               CreatePassport();
+           }
+        })
+  }else{
+      CreatePassport();
+  }
+
+  //await
 
   // If neither an email or a username was available in the profile, we don't
   // have a way of identifying the user in the future. Throw an error and let
   // whoever's next in the line take care of it.
-  if (!Object.keys(user).length) {
-    return next(new Error('Neither a username or email was available', null));
-  }
+  function CreatePassport(){
+      if (!Object.keys(user).length) {
+          return next(new Error('Neither a username or email was available', null));
+      }
 
-  Passport.findOne({
-    provider   : profile.provider
-  , identifier : query.identifier
-  })
-  .populate('user')
-  .done(function (err, passport) {
-    if (err) return next(err);
+      Passport.findOne({
+          provider   : profile.provider
+          , identifier : query.identifier
+      })
+          .populate('user')
+          .done(function (err, passport) {
+              if (err) return next(err);
 
-    if (!req.user) {
-      // Scenario: A new user is attempting to sign up using a third-party
-      //           authentication provider.
-      // Action:   Create a new user and assign them a passport.
-      if (!passport) {
-        User.create(user).done(function (err, user) {
-          if (err) return next(err);
+              if (!req.user) {
+                  // Scenario: A new user is attempting to sign up using a third-party
+                  //           authentication provider.
+                  // Action:   Create a new user and assign them a passport.
+                  if (!passport) {
+                      User.create(user).done(function (err, user) {
+                          if (err) return next(err);
 
-          query.user = user.id;
+                          query.user = user.id;
 
-          Passport.create(query).done(function (err, passport) {
-            // If a passport wasn't created, bail out
-            if (err) return next(err);
+                          Passport.create(query).done(function (err, passport) {
+                              // If a passport wasn't created, bail out
+                              if (err) return next(err);
 
-            next(err, user);
+                              next(err, user);
+                          });
+                      });
+                  }
+                  // Scenario: An existing user is trying to log in using an already
+                  //           connected passport.
+                  // Action:   Get the user associated with the passport.
+                  else {
+                      next(null, passport.user);
+                  }
+              } else {
+                  // Scenario: A user is currently logged in and trying to connect a new
+                  //           passport.
+                  // Action:   Create and assign a new passport to the user.
+                  if (!passport) {
+                      query.user = req.user.id;
+
+                      Passport.create(query).done(function (err, passport) {
+                          // If a passport wasn't created, bail out
+                          if (err) return next(err);
+
+                          next(err, req.user);
+                      });
+                  }
+                  // Scenario: The user is a nutjob or spammed the back-button.
+                  // Action:   Simply pass along the already established session.
+                  else {
+                      next(null, req.user);
+                  }
+              }
           });
-        });
-      }
-      // Scenario: An existing user is trying to log in using an already
-      //           connected passport.
-      // Action:   Get the user associated with the passport.
-      else {
-        next(null, passport.user);
-      }
-    } else {
-      // Scenario: A user is currently logged in and trying to connect a new
-      //           passport.
-      // Action:   Create and assign a new passport to the user.
-      if (!passport) {
-        query.user = req.user.id;
-
-        Passport.create(query).done(function (err, passport) {
-          // If a passport wasn't created, bail out
-          if (err) return next(err);
-
-          next(err, req.user);
-        });
-      }
-      // Scenario: The user is a nutjob or spammed the back-button.
-      // Action:   Simply pass along the already established session.
-      else {
-        next(null, req.user);
-      }
-    }
-  });
+  }
 };
 
 /**
@@ -285,7 +313,7 @@ passport.serializeUser(function (user, next) {
 });
 
 passport.deserializeUser(function (id, next) {
-  User.findOne(id).done(next);
+  User.findOne(id).exec(next);
 });
 
 module.exports = passport;

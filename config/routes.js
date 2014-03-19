@@ -38,6 +38,11 @@ module.exports.routes = {
 
   'get /auth/:provider': 'AuthController.provider',
   'get /auth/:provider/callback': 'AuthController.callback',
+   'get /match/getMatch/:match_id':'MatchController.getMatch',
+   'get /match/history':'MatchController.history',
+   'get /match/heroes':'MatchController.heroes',
+   'get /match/personalhistory':'MatchController.personalHistory',
+
 
 
   // Custom routes here...

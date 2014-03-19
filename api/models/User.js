@@ -8,12 +8,16 @@
 module.exports = {
 
 	attributes: {
-        username  : { type: 'string', unique: true },
-        email     : { type: 'email',  unique: true },
+        username  : { type: 'string'},
         passports : { collection: 'Passport', via: 'user' },
-        steamid:{type:'string',unique:true}
+        steam_id:{type:'string',unique:true},
+        avatar:'string',
+        avatarmedium:'string',
+        avatarfull:'string'
+
 
 
 	}
+
 
 };

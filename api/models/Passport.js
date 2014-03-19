@@ -80,7 +80,7 @@ var Passport = {
         passport.password = hash;
         next(err, passport);
       });
-    } else {
+    }else {
       next(null, passport);
     }
   },
