@@ -26,22 +26,24 @@ module.exports.routes = {
   // default view engine) your home page.
   // 
   // (Alternatively, remove this and add an `index.html` file in your `assets` directory)
-  '/': {
-    view: 'homepage'
-  },
-  'get /login': 'AuthController.login',
-  'get /logout': 'AuthController.logout',
-//  'get /register': 'AuthController.register',
+    '/': {
+        view: 'homepage'
+    },
+    'get /login': 'AuthController.login',
+    'get /logout': 'AuthController.logout',
+    'get /register': 'AuthController.register',
 
-//  'post /auth/local': 'AuthController.callback',
-//  'post /auth/local/:action': 'AuthController.callback',
+    'post /auth/local': 'AuthController.callback',
+    'post /auth/local/:action': 'AuthController.callback',
 
-  'get /auth/:provider': 'AuthController.provider',
-  'get /auth/:provider/callback': 'AuthController.callback',
-   'get /match/getMatch/:match_id':'MatchController.getMatch',
-   'get /match/history':'MatchController.history',
-   'get /match/heroes':'MatchController.heroes',
-   'get /match/personalhistory':'MatchController.personalHistory',
+    'get /auth/:provider': 'AuthController.provider',
+    'get /auth/:provider/callback': 'AuthController.callback',
+
+
+    'get /match/getMatch/:match_id': 'MatchController.getMatch',
+    'get /match/history': 'MatchController.history',
+    'get /match/heroes': 'MatchController.heroes',
+    'get /match/personalhistory': 'MatchController.personalHistory',
 
 
 
