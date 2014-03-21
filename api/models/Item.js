@@ -26,7 +26,7 @@ module.exports = {
             var names = values.displayname.split(';');
             values.displayname = _.last(names);
         }
-        if(!values.displayname){
+        if(!values.displayname || values.cost ===0){
            //next(new Error("Item "+values.name+"displayname is null")) ;
            return;
         }

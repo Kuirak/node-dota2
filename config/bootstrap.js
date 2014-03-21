@@ -29,35 +29,40 @@ module.exports.bootstrap = function (cb) {
 
 
 function setupItems(){
-    var itemsPath= path.join(__dirname,"items.txt");
-    fs.readFile(itemsPath,{encoding:'utf8'},function(err,data){
-        if(err){return console.error("Cannot read items.txt: "+err);}
-        var items = vdf.parse(data);
-
-        _.forIn(items.DOTAAbilities,function(item,name){
-            if(name.indexOf("item_")!==0){
-                return;
+    Item.destroy().exec(function (err, items) {
+        if (err)return console.error("Cannot Clear Items");
+        var itemsPath = path.join(__dirname, "items.txt");
+        fs.readFile(itemsPath, {encoding: 'utf8'}, function (err, data) {
+            if (err) {
+                return console.error("Cannot read items.txt: " + err);
             }
-            var itemData={
-                id :item.ID,
-                name:name,
-                cost:item.ItemCost,
-                displayname:item.ItemAliases
-            };
-            Item.findOne({id:itemData.id})
-                .then(function(item){
-                if(item){
-                 if(item.name !== itemData.name){
-                     throw new Error("Items name differs!")
-                 }
-                }else{
-                  return Item.create(itemData);
+            var items = vdf.parse(data);
+
+            _.forIn(items.DOTAAbilities, function (item, name) {
+                if (name.indexOf("item_") !== 0) {
+                    return;
                 }
-            }).fail(function(err){
-                    console.error("Cannot update Item: " + err)
-                })
-        })
-    })
+                var itemData = {
+                    id: item.ID,
+                    name: name,
+                    cost: item.ItemCost,
+                    displayname: item.ItemAliases
+                };
+                Item.findOne({id: itemData.id})
+                    .then(function (item) {
+                        if (item) {
+                            if (item.name !== itemData.name) {
+                                throw new Error("Items name differs!")
+                            }
+                        } else {
+                            return Item.create(itemData);
+                        }
+                    }).fail(function (err) {
+                        console.error("Cannot update Item: " + err)
+                    });
+            });
+        });
+    });
 }
 
 function setupPassport() {
