@@ -40,10 +40,9 @@ function setupItems(){
             }
             var itemData={
                 id :item.ID,
-                displayname:item.ItemAliases,
                 name:name,
                 cost:item.ItemCost,
-                image: "http://cdn.dota2.com/apps/dota2/images/items/"+ name.slice("item_".length)+"_lg.png"
+                displayname:item.ItemAliases
             };
             Item.findOne({id:itemData.id})
                 .then(function(item){
