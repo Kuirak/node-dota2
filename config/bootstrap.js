@@ -1,8 +1,6 @@
 var passport = require('passport')
     ,SteamStrategy = require('passport-steam').Strategy
     ,url = require('url')
-    ,steam=require('steam-web')
-    ,steamApi = null
     ,fs =require('fs')
     ,vdf =require('vdf')
     ,path =require('path');
@@ -18,7 +16,6 @@ var passport = require('passport')
  */
 
 module.exports.bootstrap = function (cb) {
-    steamApi=new steam(sails.config.steam);
     setupPassport();
     setupItems();
     // It's very important to trigger this callack method when you are finished
@@ -71,7 +68,7 @@ function setupPassport() {
     });
 
     passport.deserializeUser(function (id, done) {
-        User.findOne(id).done(function (err, user) {
+        User.findOne(id).populate('player').done(function (err, user) {
             done(err, user);
         });
     });
@@ -88,33 +85,15 @@ function setupPassport() {
                 .then(function (user) {
 
                     if (!user) {
-                        var steam_id = identifier.slice(_.lastIndexOf(identifier, '/') + 1);
-                        steamApi.getPlayerSummaries({
-                            steamids: [steam_id],
-                            callback: function (err, data) {
-                                if (err)return done(err);
-                                if (data.response.players.length <= 0) {
-                                    return done(new Error("No Player Data found for steam id"))
-                                }
-                                var player = data.response.players[0];
-                                var userData = {
-                                    identifier: identifier,
-                                    username: player.personaname,
-                                    steam_id: player.steamid,
-                                    avatar: player.avatar,
-                                    avatarmedium: player.avatarmedium,
-                                    avatarfull: player.avatarfull
-                                };
-                                User.create(userData).then(function (user) {
-                                    done(null, user);
-                                }).fail(function (err) {
-                                    });
-                            }
-                        })
+                       return User.create({identifier:identifier}).then(function (usr) {
+                            done(null, usr);
+                        });
+
                     } else {
                         return done(null, user);
                     }
 
-                }).fail(done)
-        }));
+                }).fail(done);
+
+        }))
 }

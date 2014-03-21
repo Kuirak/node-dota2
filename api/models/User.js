@@ -8,13 +8,16 @@
 module.exports = {
 
 	attributes: {
-        username  : { type: 'string'},
         identifier:{type:'string',unique:true, required:true},
-        steam_id:{type:'string',unique:true},
-        avatar:'string',
-        avatarmedium:'string',
-        avatarfull:'string'
-	}
+        player:{model:"Player"}
 
+	},
+    beforeCreate: function (values, done) {
+        var steam_id = values.identifier.slice(_.lastIndexOf(values.identifier, '/') + 1);
+        Player.create({steam_id:steam_id}).then(function(player){
+            values.player = player.id;
+            done();
+        }).fail(done);
+    }
 
 };

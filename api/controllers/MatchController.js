@@ -34,7 +34,7 @@ module.exports = {
     personalHistory:function(req,res){
         User.findOne(req.user.id).exec(function(err,user){
             if(err)res.send(500);
-            var account_id =user.steam_id;
+            var account_id =user.player.steam_id;
             dota2Api().getMatchHistory({account_id:account_id},function(err,response){
                 if(err) res.send(500);
                 res.view("match/history",{matches:response.matches});

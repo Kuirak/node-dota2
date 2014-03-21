@@ -1,14 +1,14 @@
 <div class="container">
 
-   <h1>Hello <%=req.user ? req.user.username :"Feeder"%>,</h1>
+   <h1>Hello <%=req.user ? req.user.player.username :"Feeder"%>,</h1>
     <h2>Welcome to the Dota2 Stats</h2>
 
     <%if(!req.user){%>
     <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
     <%}else{%>
     <a class="btn btn-success" href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a>
-    <p>Steam ID: <%=req.user.steam_id%></p>
-   <div class=""> <img src="<%=req.user.avatarfull%>"/>
+    <p>Steam ID: <%=req.user.player.steam_id%></p>
+   <div class=""> <img src="<%=req.user.player.avatarfull%>"/>
 
    </div>
     <div class="row"></div>

@@ -1,5 +1,5 @@
 var dazzle =require("dazzle");
-var dota2Api =null
+var dota2Api =null;
 
 module.exports = function(){
     if(!dota2Api){
