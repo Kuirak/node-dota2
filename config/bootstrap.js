@@ -2,7 +2,7 @@ var passport = require('passport')
     ,SteamStrategy = require('passport-steam').Strategy
     ,url = require('url')
     ,steam=require('steam-web')
-    ,steamApi = new steam({apiKey:'447623429FF93527982CCAA65604BC41'})
+    ,steamApi = null
     ,fs =require('fs')
     ,vdf =require('vdf')
     ,path =require('path');
@@ -18,6 +18,7 @@ var passport = require('passport')
  */
 
 module.exports.bootstrap = function (cb) {
+    steamApi=new steam(sails.config.steam);
     setupPassport();
     setupItems();
     // It's very important to trigger this callack method when you are finished
@@ -71,7 +72,7 @@ function setupPassport() {
         });
     });
 
-    var baseUrl = require('./local').baseUrl;
+    var baseUrl = sails.config.baseUrl;
 
     passport.use(new SteamStrategy(
         {

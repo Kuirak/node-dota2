@@ -48,13 +48,13 @@ module.exports.connections = {
   // Run:
   // npm install sails-mongo
   //
-  someMongodbServer: {
+  localMongoDb: {
     adapter   : 'sails-mongo',
-    host      : 'localhost',
-    port      : 27017,
-    user      : 'username',
-    password  : 'password',
-    database  : 'your mongo db name here'
+    host      : require('./local').mongo.host,
+    port      : require('./local').mongo.port,
+    user      : require('./local').mongo.user,
+    password  : require('./local').mongo.password,
+    database  : 'node-dota2'
   },
 
   // PostgreSQL is another officially supported relational database. 
