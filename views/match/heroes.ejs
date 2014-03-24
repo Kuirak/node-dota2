@@ -1,10 +1,10 @@
 <div class="container">
          <% heroes.forEach(function(hero){ %>
      <div class="col-xs-6 col-sm-4">
-                  <h1><%=hero.localized_name%></h1>
+                  <h1><%=hero.displayname%></h1>
                   <p>ID:<%=hero.id%></p>
                   <p>Name:<%=hero.name.slice("npc_dota_hero_".length)%></p>
-                  <img src="http://cdn.dota2.com/apps/dota2/images/heroes/<%= hero.name.slice("npc_dota_hero_".length) %>_lg.png" alt="<%=hero.name%>"/>
+                  <img src="<%=hero.image%>" alt="<%=hero.name%>"/>
               </div>
          <%})%>
 </div>

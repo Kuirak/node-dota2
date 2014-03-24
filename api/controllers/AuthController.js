@@ -21,10 +21,6 @@ var AuthController ={
 
         })(req,res)
     }
-
-
-
-
 };
 
 module.exports = AuthController;

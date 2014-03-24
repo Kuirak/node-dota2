@@ -9,10 +9,7 @@ module.exports = {
 
 	attributes: {
         match_id:{type: 'string',unique:true},
-
-
-
-
+        players:{collection:'player',via:'matches',dominant:true},
 
 	}
 

@@ -14,7 +14,7 @@ module.exports = {
         name:{type:'string',unique:true},
         cost:'integer'
 	},
-    beforeCreate:function(values,next){
+    beforeCreate:function(values,done){
         var base = "http://cdn.dota2.com/apps/dota2/images/items/";
         if(_.contains(values.name,"recipe")){
             values.image = base+ "recipe_lg.png";
@@ -27,9 +27,9 @@ module.exports = {
             values.displayname = _.last(names);
         }
         if(!values.displayname || values.cost ===0){
-           //next(new Error("Item "+values.name+"displayname is null")) ;
+           //done(new Error("Item "+values.name+"displayname is null")) ;
            return;
         }
-        next();
+        done();
     }
 };

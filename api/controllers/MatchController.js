@@ -25,22 +25,13 @@ module.exports = {
         })
     },
     heroes:function(req,res){
-        dota2Api().getHeroes(function(err,response){
-            if(err)res.send(500);
-
-            res.view({heroes:response.heroes})
-        })
+       Hero.find().then(function(heroes){res.view({heroes:heroes});}).fail(res.serverError);
     },
-    personalHistory:function(req,res){
-        User.findOne(req.user.id).exec(function(err,user){
-            if(err)res.send(500);
-            var account_id =user.player.steam_id;
-            dota2Api().getMatchHistory({account_id:account_id},function(err,response){
-                if(err) res.send(500);
-                res.view("match/history",{matches:response.matches});
-            })
-        });
-
-
+    personalHistory: function (req, res) {
+        var account_id = req.user.player.steam_id;
+        dota2Api().getMatchHistory({account_id: account_id}, function (err, response) {
+            if (err) res.send(500);
+            res.view("match/history", {matches: response.matches});
+        })
     }
 };

@@ -13,7 +13,8 @@ module.exports = {
         avatar:'string',
         avatarmedium:'string',
         avatarfull:'string',
-        anonymous:'bool'
+        anonymous:'bool',
+        matches:{collection:'match',via:'players'}
 	},
     beforeCreate: function(values,done){
         steamApi().getPlayerSummaries({
@@ -24,14 +25,14 @@ module.exports = {
                     return done(new Error("No Player Data found for steam id"));
                 }
                 var player = data.response.players[0];
-                values = {
+                _.merge(values, {
                     username: player.personaname,
                     steam_id: player.steamid,
                     avatar: player.avatar,
                     avatarmedium: player.avatarmedium,
                     avatarfull: player.avatarfull,
                     anonymous :player.communityvisibilitystate == 1
-                };
+                });
                 done();
             }
         })
