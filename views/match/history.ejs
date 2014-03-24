@@ -2,8 +2,7 @@
     <% matches.forEach(function(match){%>
     <div>
         <h2>Match <%=match.match_id%></h2>
-        <p>Match Type : <%=match.lobby_type%></p>
-        <a href="getMatch/<%=match.match_id%>"> View Details</a>
+        <a href="details/<%=match.match_id%>"> View Details</a>
     </div>
     <%})%>
 </div>

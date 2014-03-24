@@ -4,7 +4,7 @@
  * @description ::
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
-
+var big = require('big-integer');
 
 
 
@@ -15,6 +15,19 @@ module.exports = {
             if(err) res.send(500);
             res.view({match:response})
         })
+    },
+    details:function(req,res){
+        var match_id=req.params.match_id;
+        Match.findOne()
+            .where({match_id:match_id})
+            .populate('players',{populate: true})
+            .populate('radiant_players')
+            .populate('dire_players')
+            .populate('dire_heroes')
+            .populate('radiant_heroes')
+            .then(function(match){
+               res.view({match:match});
+            }).fail(res.serverError);
     },
     history:function(req,res){
         dota2Api().getMatchHistory(function(err,response){
@@ -29,9 +42,61 @@ module.exports = {
     },
     personalHistory: function (req, res) {
         var account_id = req.user.player.steam_id;
-        dota2Api().getMatchHistory({account_id: account_id}, function (err, response) {
+        dota2Api().getMatchHistory({account_id: account_id, matches_requested: 1}, function (err, response) {
             if (err) res.send(500);
-            res.view("match/history", {matches: response.matches});
+            var matches = [];
+            async.each(response.matches, function (match, done) {
+                var match_id =match.match_id;
+                Match.findOne().where({match_id: match_id}).then(function (matchDb) {
+                    if(matchDb){
+                    matches.push(matchDb);
+                    return done();
+                    }
+
+                var matchData = {
+                    dire_players: [],
+                    radiant_players: [],
+                    dire_heroes: [],
+                    radiant_heroes: [],
+                    players: []
+                };
+                async.eachSeries(match.players, function (player, done) {
+                    var steam_id = big(player.account_id).add("76561197960265728").toString();
+                    Player.findOrCreate({steam_id: steam_id}, {steam_id: steam_id}).then(function (playerDb) {
+                        if (player.player_slot < 5 || (player.player_slot > 127 && player.player_slot < 133))
+                            matchData.players.push(playerDb.id);
+                        if (player.player_slot < 5) {
+                            //radiant
+                            matchData.radiant_players.push(playerDb.id);
+                            matchData.radiant_heroes.push(player.hero_id);
+                        } else if (player.player_slot > 127 && player.player_slot < 133) {
+                            //dire
+                            matchData.dire_players.push(playerDb);
+                            matchData.dire_heroes.push(player.hero_id);
+                        }
+                        done();
+                    }).fail(done);
+
+                }, function (err) {
+                    if (err) return done(err);
+                    Match.create({match_id: match.match_id}).then(function (match) {
+                        _.forIn(matchData, function (value, key) {
+                            _.each(value, function (player) {
+                                match[key].add(player);
+                            })
+                        });
+                        match.save(function (err) {
+                            if (err)return done(err);
+                            matches.push(match);
+                            done();
+                        });
+                    }).fail(done);
+                });
+              }).fail(done);
+            }, function (err) {
+                if (err) return res.serverError(err);
+                res.view("match/history", {matches: matches});
+            });
         })
     }
 };

@@ -28,7 +28,8 @@
     "validator": "^3.5.0",
     "dazzle": "^1.0.4",
     "steam-web": "^0.2.1",
-    "vdf": "0.0.2"
+    "vdf": "0.0.2",
+    "big-integer": "^1.1.8"
   },
   "scripts": {
     "start": "node app.js",

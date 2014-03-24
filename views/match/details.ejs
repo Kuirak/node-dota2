@@ -1,0 +1,18 @@
+<div class="container">
+    <h3><%=match.match_id%></h3>
+    <table class="table table-striped">
+        <%for(var i=0;i<match.dire_players;i++){
+            var player =match.dire_players[i];
+            var hero =match.dire_heroes[i];
+        %>
+        <tr>
+            <td><img src="<%=player.avatar%>" alt=""/></td>
+            <td><%=player.name%></td>
+            <td><img src="<%=hero.image%>" alt=""/></td>
+            <td><%=hero.displayname%></td>
+        </tr>
+        <%}%>
+    </table>
+
+
+</div>

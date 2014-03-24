@@ -8,8 +8,12 @@
 module.exports = {
 
 	attributes: {
-        match_id:{type: 'string',unique:true},
+        match_id:{type: 'string',unique:true,required:true},
         players:{collection:'player',via:'matches',dominant:true},
+        radiant_players:{collection:'player',via: 'radiant_matches',dominant: true},
+        dire_players:{collection: 'player',via: 'dire_matches',dominant: true},
+        radiant_heroes:{collection: 'hero',via: 'radiant_matches',dominant: true},
+        dire_heroes:{collection: 'hero',via: 'dire_matches',dominant: true},
 
 	}
 

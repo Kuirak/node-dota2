@@ -14,7 +14,11 @@ module.exports = {
         avatarmedium:'string',
         avatarfull:'string',
         anonymous:'bool',
-        matches:{collection:'match',via:'players'}
+        matches:{collection:'match',via:'players'},
+        dire_matches:{collection:'match',via: 'dire_players'},
+        radiant_matches:{collection:'match',via: 'radiant_players'},
+
+
 	},
     beforeCreate: function(values,done){
         steamApi().getPlayerSummaries({
@@ -22,7 +26,7 @@ module.exports = {
             callback: function (err, data) {
                 if (err)return done(err);
                 if (data.response.players.length <= 0) {
-                    return done(new Error("No Player Data found for steam id"));
+                    return done();
                 }
                 var player = data.response.players[0];
                 _.merge(values, {
