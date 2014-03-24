@@ -17,17 +17,19 @@ module.exports = {
         })
     },
     details:function(req,res){
-        var match_id=req.params.match_id;
-        Match.findOne()
-            .where({match_id:match_id})
-            .populate('players',{populate: true})
+        var match_id=parseInt(req.params.match_id);
+        Match.findOne({match_id:match_id})
             .populate('radiant_players')
             .populate('dire_players')
             .populate('dire_heroes')
             .populate('radiant_heroes')
-            .then(function(match){
+            .exec(function(err,match){
+               if(err){
+                   res.serverError(err);
+                   return
+               }
                res.view({match:match});
-            }).fail(res.serverError);
+            });
     },
     history:function(req,res){
         dota2Api().getMatchHistory(function(err,response){
@@ -42,17 +44,17 @@ module.exports = {
     },
     personalHistory: function (req, res) {
         var account_id = req.user.player.steam_id;
-        dota2Api().getMatchHistory({account_id: account_id, matches_requested: 1}, function (err, response) {
+        dota2Api().getMatchHistory({account_id: account_id, matches_requested: 10}, function (err, response) {
             if (err) res.send(500);
             var matches = [];
             async.each(response.matches, function (match, done) {
                 var match_id =match.match_id;
                 Match.findOne().where({match_id: match_id}).then(function (matchDb) {
-                    if(matchDb){
-                    matches.push(matchDb);
-                    return done();
+                    if (matchDb) {
+                        matches.push(matchDb);
+                        done();
+                        return
                     }
-
                 var matchData = {
                     dire_players: [],
                     radiant_players: [],
@@ -63,18 +65,24 @@ module.exports = {
                 async.eachSeries(match.players, function (player, done) {
                     var steam_id = big(player.account_id).add("76561197960265728").toString();
                     Player.findOrCreate({steam_id: steam_id}, {steam_id: steam_id}).then(function (playerDb) {
+                        var promise;
                         if (player.player_slot < 5 || (player.player_slot > 127 && player.player_slot < 133))
                             matchData.players.push(playerDb.id);
                         if (player.player_slot < 5) {
                             //radiant
                             matchData.radiant_players.push(playerDb.id);
-                            matchData.radiant_heroes.push(player.hero_id);
+                            promise = Hero.findOne({hero_id:player.hero_id.toString()}).then(function(hero){
+                                matchData.radiant_heroes.push(hero.id);
+                            });
                         } else if (player.player_slot > 127 && player.player_slot < 133) {
                             //dire
-                            matchData.dire_players.push(playerDb);
-                            matchData.dire_heroes.push(player.hero_id);
+                            matchData.dire_players.push(playerDb.id);
+                            promise= Hero.findOne({hero_id:player.hero_id.toString()}).then(function(hero){
+                                matchData.dire_heroes.push(hero.id);
+                            });
                         }
-                        done();
+                       return promise.then(done)
+
                     }).fail(done);
 
                 }, function (err) {
