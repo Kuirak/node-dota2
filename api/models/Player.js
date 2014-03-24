@@ -9,7 +9,7 @@ module.exports = {
 
 	attributes: {
         username  : { type: 'string'},
-        steam_id:{type:'string',unique:true},
+        steam_id:{type:'string',unique:true,required:true},
         avatar:'string',
         avatarmedium:'string',
         avatarfull:'string',
@@ -26,7 +26,9 @@ module.exports = {
             callback: function (err, data) {
                 if (err)return done(err);
                 if (data.response.players.length <= 0) {
-                    return done();
+                    values.anonymous =true;
+                    done();
+                    return
                 }
                 var player = data.response.players[0];
                 _.merge(values, {

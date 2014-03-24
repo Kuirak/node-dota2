@@ -12,7 +12,7 @@ module.exports = {
         imagemedium:'string',
         imagevert:'string',
         imagefull:'string',
-        id:{type:'integer',unique:true,primaryKey:true},
+        hero_id:{type:'string',unique:true},
         displayname:'string',
         name:{type:'string',unique:true},
         dire_matches:{collection:'match',via: 'dire_heroes'},

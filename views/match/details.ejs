@@ -1,14 +1,35 @@
 <div class="container">
-    <h3><%=match.match_id%></h3>
+    <h3>Match <%=match.match_id%></h3>
+
     <table class="table table-striped">
-        <%for(var i=0;i<match.dire_players;i++){
+        <h3>Dire Team:</h3>
+
+        <%for(var i=0;i<match.dire_players.length;i++){
             var player =match.dire_players[i];
             var hero =match.dire_heroes[i];
         %>
-        <tr>
+        <tr><%if(player.anonymous){%>
+            <td><span class="glyphicon glyphicon-user"></span></td>
+            <td>Anonymous</td>
+            <%}else {%>
             <td><img src="<%=player.avatar%>" alt=""/></td>
-            <td><%=player.name%></td>
-            <td><img src="<%=hero.image%>" alt=""/></td>
+            <td><%=player.username%></td>
+            <%}%>
+            <td><img src="<%=hero.image%>" alt="<%=hero.displayname%>"/></td>
+            <td><%=hero.displayname%></td>
+        </tr>
+        <%}%>
+<tr>
+           <td> <h3>Radiant Team:</h3></td>
+</tr>
+        <%for(var i=0;i<match.radiant_players.length;i++){
+            var player =match.radiant_players[i];
+            var hero =match.radiant_heroes[i];
+        %>
+        <tr>
+            <td><img src="<%=player.anonymous?"":player.avatar%>" alt=""/></td>
+            <td><%=player.anonymous?"Anonymous": player.username%></td>
+            <td><img src="<%=hero.image%>" alt="<%=hero.displayname%>"/></td>
             <td><%=hero.displayname%></td>
         </tr>
         <%}%>

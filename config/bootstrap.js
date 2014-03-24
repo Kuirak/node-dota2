@@ -27,16 +27,12 @@ module.exports.bootstrap = function (cb) {
 function setupHeroes(){
     var dazzle =require("dazzle");
     var dota2Api = new dazzle(require('./local').steam.apiKey);
-    Hero.destroy().exec(function(err,heroes){
-        if(err)return console.error("Cannot get Heroes from Dota 2 WebApi: " + err );
         dota2Api.getHeroes(function(err,response){
             if(err)return console.error("Cannot get Heroes from Dota 2 WebApi: " + err );
             _.each(response.heroes,function(hero){
-                Hero.create({id: hero.id,displayname:hero.localized_name,name:hero.name}).fail(function(err){console.error("Cannot create Hero:" +err);});
+                Hero.findOrCreate({hero_id: hero.id},{hero_id: hero.id,displayname:hero.localized_name,name:hero.name}).fail(function(err){console.error("Cannot create Hero:" +err);});
             })
-
-        });
-    });
+        })
 
 }
 
