@@ -12,7 +12,8 @@ module.exports = {
         id: {type: 'integer', unique:true,primaryKey:true},
         displayname:{type:'string'},
         name:{type:'string',unique:true},
-        cost:'integer'
+        cost:'integer',
+        playerdetails:{collection:'matchplayerdetails',via:'items'},
 	},
     beforeCreate:function(values,done){
         var base = "http://cdn.dota2.com/apps/dota2/images/items/";

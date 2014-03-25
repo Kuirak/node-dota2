@@ -39,8 +39,6 @@ function setupHeroes(){
 
 
 function setupItems(){
-    Item.destroy().exec(function (err, items) {
-        if (err)return console.error("Cannot Clear Items");
         var itemsPath = path.join(__dirname, "items.txt");
         fs.readFile(itemsPath, {encoding: 'utf8'}, function (err, data) {
             if (err) {
@@ -58,21 +56,19 @@ function setupItems(){
                     cost: item.ItemCost,
                     displayname: item.ItemAliases
                 };
-                Item.findOne({id: itemData.id})
+                Item.findOrCreate({id: itemData.id},itemData)
                     .then(function (item) {
                         if (item) {
                             if (item.name !== itemData.name) {
                                 throw new Error("Items name differs!")
                             }
-                        } else {
-                            return Item.create(itemData);
                         }
                     }).fail(function (err) {
                         console.error("Cannot update Item: " + err)
                     });
             });
         });
-    });
+
 }
 
 function setupPassport() {

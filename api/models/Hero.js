@@ -15,9 +15,7 @@ module.exports = {
         hero_id:{type:'string',unique:true},
         displayname:'string',
         name:{type:'string',unique:true},
-        dire_matches:{collection:'match',via: 'dire_heroes'},
-        radiant_matches:{collection:'match',via: 'radiant_heroes'},
-
+        source:'json'
 	},
     beforeCreate: function (values, done) {
         var baseUrl = "http://cdn.dota2.com/apps/dota2/images/heroes/";

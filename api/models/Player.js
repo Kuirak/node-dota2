@@ -15,9 +15,6 @@ module.exports = {
         avatarfull:'string',
         anonymous:'bool',
         matches:{collection:'match',via:'players'},
-        dire_matches:{collection:'match',via: 'dire_players'},
-        radiant_matches:{collection:'match',via: 'radiant_players'},
-
 
 	},
     beforeCreate: function(values,done){
