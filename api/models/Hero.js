@@ -12,9 +12,10 @@ module.exports = {
         imagemedium:'string',
         imagevert:'string',
         imagefull:'string',
-        hero_id:{type:'string',unique:true},
+        hero_id:{type:'integer',unique:true},
         displayname:'string',
         name:{type:'string',unique:true},
+        roleweight:{model:'roleweight'},
         source:'json'
 	},
     beforeCreate: function (values, done) {

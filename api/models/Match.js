@@ -14,7 +14,7 @@ module.exports = {
         lobby_type:'integer', //convert to enum
         start_time: 'date',
         details:{model:'matchdetails'},
-        playerdetails:{collection: 'playerdetails',via:'match'}
+        playerdetails:{collection: 'matchplayerdetails',via:'match'}
 	}
 
 };
