@@ -3,7 +3,10 @@ var passport = require('passport')
     ,url = require('url')
     ,fs =require('fs')
     ,vdf =require('vdf')
-    ,path =require('path');
+    ,path =require('path')
+    ,Csv = require('awklib')
+    ,Q=require('q')
+    ,q=require('async-q');
 
 /**
  * Bootstrap
@@ -17,58 +20,115 @@ var passport = require('passport')
 
 module.exports.bootstrap = function (cb) {
     setupPassport();
-    setupItems();
-    setupHeroes();
+    var promises =[];
+    promises.push(setupHeroes());
+    promises.push(setupItems().then(addItemWeight));
+    Q.all(promises).then(function(){cb();}).fail(cb);
+
+
     // It's very important to trigger this callack method when you are finished
     // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-    cb();
+
 };
 
 function setupHeroes(){
+    var deferred = Q.defer();
     var dazzle =require("dazzle");
     var dota2Api = new dazzle(require('./local').steam.apiKey);
         dota2Api.getHeroes(function(err,response){
-            if(err)return console.error("Cannot get Heroes from Dota 2 WebApi: " + err );
+            if(err)return deferred.reject(err);
+            var promises =[];
             _.each(response.heroes,function(hero){
-                Hero.findOrCreate({hero_id: hero.id},{hero_id: hero.id,displayname:hero.localized_name,name:hero.name}).fail(function(err){console.error("Cannot create Hero:" +err);});
-            })
-        })
+               promises.push( Hero.findOrCreate({hero_id: hero.id},{hero_id: hero.id,displayname:hero.localized_name,name:hero.name})
+                    .then(function(hero){return hero;}));
+            });
+            Q.all(promises).then(deferred.resolve).fail(deferred.reject);
+        });
+    return deferred.promise;
 
 }
 
 
-
 function setupItems(){
-        var itemsPath = path.join(__dirname, "items.txt");
-        fs.readFile(itemsPath, {encoding: 'utf8'}, function (err, data) {
-            if (err) {
-                return console.error("Cannot read items.txt: " + err);
+    var deferred = Q.defer();
+    var itemsPath = path.join(__dirname, "items.txt");
+    fs.readFile(itemsPath, {encoding: 'utf8'}, function (err, data) {
+        if (err) {
+            deferred.reject(err);
+            return;
+        }
+        var items = vdf.parse(data);
+        var itemDatas=[];
+        _.forIn(items.DOTAAbilities, function (item, name) {
+            if (name.indexOf("item_") !== 0) {
+                return;
             }
-            var items = vdf.parse(data);
-
-            _.forIn(items.DOTAAbilities, function (item, name) {
-                if (name.indexOf("item_") !== 0) {
-                    return;
-                }
-                var itemData = {
-                    id: item.ID,
-                    name: name,
-                    cost: item.ItemCost,
-                    displayname: item.ItemAliases
-                };
-                Item.findOrCreate({id: itemData.id},itemData)
-                    .then(function (item) {
-                        if (item) {
-                            if (item.name !== itemData.name) {
-                                throw new Error("Items name differs!")
-                            }
-                        }
-                    }).fail(function (err) {
-                        console.error("Cannot update Item: " + err)
-                    });
+            if(_.contains(name,"recipe")){
+                item.ItemAliases = name.slice("item_".length).replace(/_/g, ' ');
+            }
+            if(!item.ItemAliases ||parseInt(item.ItemCost) ===0){
+                return;
+            }
+            itemDatas.push( {
+                item_id: item.ID.toString(),
+                name: name,
+                cost: item.ItemCost,
+                displayname: item.ItemAliases
             });
         });
 
+
+        Q.all(q.map(itemDatas,function(itemData){
+                return Item.findOrCreate({item_id: itemData.item_id}, itemData);
+            })).then(deferred.resolve);
+
+    });
+    return deferred.promise;
+}
+
+function addItemWeight(items){
+        var deferred = Q.defer();
+        var itemsCsvPath = path.join(__dirname,'items.csv');
+        var csvOptions ={
+            files:[itemsCsvPath],
+            columns:['name','support','pusher','carry','durable','initiator','escaper','disabler','lane_support','nuker','jungler','roamer','ganker'],
+            header:true,
+            delimiter:';'
+        };
+        var csvParser =new Csv(csvOptions);
+        var promises =[];
+        csvParser.on('line',function(obj){
+          var item= _.find(items,function(item){return item.name ===obj.crow.name})
+
+            if(item){
+                _.forOwn(obj.crow,function(value,key){
+                    if(_.contains(value,'\r')){
+                        obj.crow[key] =value.replace(/\r/g,'');
+                        value = value.replace(/\r/g,'')
+                    }
+                    if(value.length <=0){
+                        obj.crow[key] =0
+                    }else if(key !=='name'){
+                        obj.crow[key] =parseInt(obj.crow[key]);
+                    }
+                    if(key !=='name'&& isNaN(obj.crow[key])){
+                        return;
+                    }
+                });
+               promises.push(
+                   Roleweight.findOrCreate({name:item.name},obj.crow)
+                   .then(function(weight){
+                        return Item.update({id:item.id},{roleweight:weight.id});
+                   }).then(function(item){
+                        return item;
+                   }));
+            }
+        });
+        csvParser.on("end",function(obj){
+            Q.all(promises).then(deferred.resolve).fail(deferred.reject);
+        });
+        csvParser.process();
+    return deferred.promise;
 }
 
 function setupPassport() {

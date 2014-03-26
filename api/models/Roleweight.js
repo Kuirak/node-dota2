@@ -8,6 +8,7 @@
 module.exports = {
 
 	attributes: {
+        name:{type:'string',unique:true},
         support:'integer',
         pusher:'integer',
         carry:'integer',

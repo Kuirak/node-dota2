@@ -1,3 +1,7 @@
+var fs =require('fs')
+    ,vdf =require('vdf')
+    ,path =require('path')
+    ,Csv = require('awklib')
 /**
  * ItemController.js 
  *
@@ -7,9 +11,11 @@
 
 module.exports = {
 	all:function(req,res){
-        Item.find().then(function(items){
+        Item.find().populate('roleweight').sort('name').then(function(items){
             res.view({items:items});
         }).fail(res.serverError);
-
     }
+
 };
+
+

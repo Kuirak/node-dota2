@@ -9,11 +9,12 @@ module.exports = {
 
 	attributes: {
         image:'string',
-        id: {type: 'integer', unique:true,primaryKey:true},
+        item_id: {type: 'string', unique:true},
         displayname:{type:'string'},
         name:{type:'string',unique:true},
         cost:'integer',
         playerdetails:{collection:'matchplayerdetails',via:'items'},
+        roleweight:{model:'roleweight'},
 	},
     beforeCreate:function(values,done){
         var base = "http://cdn.dota2.com/apps/dota2/images/items/";
@@ -27,9 +28,10 @@ module.exports = {
             var names = values.displayname.split(';');
             values.displayname = _.last(names);
         }
+
         if(!values.displayname || values.cost ===0){
-           //done(new Error("Item "+values.name+"displayname is null")) ;
-           return;
+            console.error("Didn't create: "+values.name);
+            return;
         }
         done();
     }

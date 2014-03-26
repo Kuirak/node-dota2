@@ -23,6 +23,9 @@ module.exports.policies = {
    },
     ItemController:{
         '*':true
+    },
+    MatchController:{
+        'heroes':true
     }
 
 
