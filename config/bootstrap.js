@@ -21,7 +21,9 @@ var passport = require('passport')
 module.exports.bootstrap = function (cb) {
     setupPassport();
     var promises =[];
-    promises.push(setupHeroes());
+    promises.push(setupHeroes().then(function(heroes){
+        return addItemWeight(heroes,true);
+    }));
     promises.push(setupItems().then(addItemWeight));
     Q.all(promises).then(function(){cb();}).fail(cb);
 
@@ -86,9 +88,14 @@ function setupItems(){
     return deferred.promise;
 }
 
-function addItemWeight(items){
+function addItemWeight(items ,heroes){
         var deferred = Q.defer();
-        var itemsCsvPath = path.join(__dirname,'items.csv');
+        var itemsCsvPath;
+        if(heroes){
+            itemsCsvPath = path.join(__dirname,'heroes.csv');
+        }else{
+            itemsCsvPath=path.join(__dirname,'items.csv');
+        }
         var csvOptions ={
             files:[itemsCsvPath],
             columns:['name','support','pusher','carry','durable','initiator','escaper','disabler','lane_support','nuker','jungler','roamer','ganker'],
@@ -98,30 +105,46 @@ function addItemWeight(items){
         var csvParser =new Csv(csvOptions);
         var promises =[];
         csvParser.on('line',function(obj){
-          var item= _.find(items,function(item){return item.name ===obj.crow.name})
-
+          var item= _.find(items,function(item){return item.name ===obj.crow.name});
+            var current =obj.crow;
             if(item){
-                _.forOwn(obj.crow,function(value,key){
+                _.forOwn(current,function(value,key){
                     if(_.contains(value,'\r')){
-                        obj.crow[key] =value.replace(/\r/g,'');
+                        current[key] =value.replace(/\r/g,'');
                         value = value.replace(/\r/g,'')
                     }
                     if(value.length <=0){
-                        obj.crow[key] =0
+                        current[key] =0
                     }else if(key !=='name'){
-                        obj.crow[key] =parseInt(obj.crow[key]);
+                        current[key] =parseInt(current[key]);
                     }
-                    if(key !=='name'&& isNaN(obj.crow[key])){
+                    if(key !=='name'&& isNaN(current[key])){
                         return;
                     }
                 });
                promises.push(
-                   Roleweight.findOrCreate({name:item.name},obj.crow)
+                   Roleweight.findOne({name:current.name})
                    .then(function(weight){
-                        return Item.update({id:item.id},{roleweight:weight.id});
+                       if(weight){
+                           return Roleweight.update({id:weight.id},current);
+                       }else{
+                            return Roleweight.create(current);
+                       }
+                   }).then(function(weight){
+                       if(!weight){
+                           throw new Error("No Roleweight found or created");
+                       }
+                       if(heroes){
+                           return Hero.update({id:item.id},{roleweight:weight.id})
+                       }else {
+                           return Item.update({id: item.id}, {roleweight: weight.id});
+                       }
                    }).then(function(item){
+
                         return item;
                    }));
+            }else{
+                throw new Error("Item not found " + obj.crow.name);
             }
         });
         csvParser.on("end",function(obj){
