@@ -31,8 +31,9 @@
     "vdf": "0.0.2",
     "big-integer": "^1.1.8",
     "awklib": "^0.1.0",
-    "q":"*",
-    "async-q":"*"
+    "q": "*",
+    "async-q": "*",
+    "moment": "^2.5.1"
   },
   "scripts": {
     "start": "node app.js",

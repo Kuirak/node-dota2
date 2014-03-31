@@ -34,7 +34,7 @@ module.exports = {
                     avatar: player.avatar,
                     avatarmedium: player.avatarmedium,
                     avatarfull: player.avatarfull,
-                    anonymous :player.communityvisibilitystate == 1
+                    anonymous :parseInt(player.communityvisibilitystate) === 1
                 });
                 done();
             }

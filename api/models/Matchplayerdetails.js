@@ -9,6 +9,7 @@ module.exports = {
 
 	attributes: {
         match:{model: 'match'},
+        player:{model:'player'},
         items:{collection:'item',via:'playerdetails', dominant:true},
         radiant:'bool',
         hero:{model:'hero'},

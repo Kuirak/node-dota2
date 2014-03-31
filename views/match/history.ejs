@@ -1,7 +1,11 @@
+
+
 <div class="container">
     <% matches.forEach(function(match){%>
     <div>
         <h2>Match <%=match.match_id%></h2>
+        <p>Start: <%=moment(match.start_time).fromNow()%></p>
+        <p>Lobby type: <%=match.lobby_type%></p>
         <a href="details/<%=match.match_id%>"> View Details</a>
     </div>
     <%})%>

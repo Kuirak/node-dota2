@@ -19,10 +19,9 @@ module.exports = {
     details:function(req,res){
         var match_id=parseInt(req.params.match_id);
         Match.findOne({match_id:match_id})
-            .populate('radiant_players')
-            .populate('dire_players')
-            .populate('dire_heroes')
-            .populate('radiant_heroes')
+            .populate('players')
+            .populate('details')
+            .populate('playerdetails')
             .exec(function(err,match){
                if(err){
                    res.serverError(err);
@@ -42,19 +41,28 @@ module.exports = {
     heroes:function(req,res){
        Hero.find().sort('name').then(function(heroes){res.view({heroes:heroes});}).fail(res.serverError);
     },
-    personalHistory: function (req, res) {
+    personalHistory: function(req,res){
         var account_id = req.user.player.steam_id;
-        dota2Api().getMatchHistory({account_id: account_id, matches_requested: 10}, function (err, response) {
-            if (err) res.send(500);
-            var matches = [];
-            async.each(response.matches, function (match, done) {
-                var match_id =match.match_id;
-                Match.findOne().where({match_id: match_id}).then(function (matchDb) {
-                    if (matchDb) {
-                        matches.push(matchDb);
-                        done();
-                        return
-                    }
+        dota2Api.populateMatchHistory({account_id:account_id,matches_requested:10})
+            .then(function(matches){
+                res.view("match/history", {matches: matches,moment:require('moment')});
+            }).fail(res.serverError);
+    }
+};
+
+function bla(req, res) {
+    var account_id = req.user.player.steam_id;
+    dota2Api().getMatchHistory({account_id: account_id, matches_requested: 10}, function (err, response) {
+        if (err) res.send(500);
+        var matches = [];
+        async.each(response.matches, function (match, done) {
+            var match_id =match.match_id;
+            Match.findOne().where({match_id: match_id}).then(function (matchDb) {
+                if (matchDb) {
+                    matches.push(matchDb);
+                    done();
+                    return
+                }
                 var matchData = {
                     dire_players: [],
                     radiant_players: [],
@@ -81,7 +89,7 @@ module.exports = {
                                 matchData.dire_heroes.push(hero.id);
                             });
                         }
-                       return promise.then(done)
+                        return promise.then(done)
 
                     }).fail(done);
 
@@ -100,11 +108,10 @@ module.exports = {
                         });
                     }).fail(done);
                 });
-              }).fail(done);
-            }, function (err) {
-                if (err) return res.serverError(err);
-                res.view("match/history", {matches: matches});
-            });
-        })
-    }
-};
+            }).fail(done);
+        }, function (err) {
+            if (err) return res.serverError(err);
+            res.view("match/history", {matches: matches});
+        });
+    })
+}
