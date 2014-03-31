@@ -9,7 +9,7 @@ module.exports = {
 
 	attributes: {
         match:{model:'match'},
-        radiant_win:'bool',
+        radiant_win:'boolean',
         duration:'integer',
         first_blood_time:'integer',
         game_mode:'integer', //convert to enum

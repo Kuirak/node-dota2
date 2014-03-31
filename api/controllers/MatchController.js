@@ -43,7 +43,7 @@ module.exports = {
     },
     personalHistory: function(req,res){
         var account_id = req.user.player.steam_id;
-        dota2Api.populateMatchHistory({account_id:account_id,matches_requested:10})
+        dota2Api.populateMatchHistory({account_id:account_id,matches_requested:100})
             .then(function(matches){
                 res.view("match/history", {matches: matches,moment:require('moment')});
             }).fail(res.serverError);
@@ -52,7 +52,7 @@ module.exports = {
 
 function bla(req, res) {
     var account_id = req.user.player.steam_id;
-    dota2Api().getMatchHistory({account_id: account_id, matches_requested: 10}, function (err, response) {
+    dota2Api().getMatchHistory({account_id: account_id, matches_requested: 100}, function (err, response) {
         if (err) res.send(500);
         var matches = [];
         async.each(response.matches, function (match, done) {

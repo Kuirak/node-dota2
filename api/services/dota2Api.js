@@ -19,10 +19,16 @@ function populateMatchHistory(options){
     var deferred = Q.defer();
     var dota2Api = init();
     dota2Api.getMatchHistory(options,function(err,response){
-        if(err) throw new Error(err);
-        if(response.status !== 1){
-            throw new Error("Dota2Api: StatusCode " +response.status+" - "+ response.statusDetail);
+        if(err) {
+            deferred.reject(err);
+            return;
         }
+        if(response.status !== 1){
+            deferred.reject(new Error("Dota2Api: StatusCode " +response.status+" - "+ response.statusDetail));
+            return;
+        }
+
+
         var results = {
             total: response.total_results,
             count: response.num_results,
@@ -31,6 +37,12 @@ function populateMatchHistory(options){
 
         var matches = response.matches;
         var promises = q.map(matches,function(match){
+            if(match.lobby_type <0){
+                deferred.reject(new Error("Dota2Api: Invalid Lobbytype"));
+                return
+            }if(match.lobby_type >0 || response.lobby_type <5){
+                return null;
+            }
             var start_time = moment.unix(match.start_time);
 
             var matchData={
@@ -42,7 +54,13 @@ function populateMatchHistory(options){
 
             return Q.all(q.mapSeries(match.players,function(player){
                 var steam_id = big(player.account_id).add("76561197960265728").toString();
-                return Player.findOrCreate({steam_id: steam_id}, {steam_id: steam_id});
+                return Player.find({steam_id: steam_id}).then(function(player){
+                    if(player){
+                        return player;
+                    }else{
+                        return Player.create( {steam_id: steam_id});
+                    }
+                });
             })).then(function(players){
                 return Match.findOrCreate({match_id:match.match_id},matchData)
                     .populate('players')
@@ -56,19 +74,22 @@ function populateMatchHistory(options){
                                 }
                             });
                         }
-//                            return Q.ninvoke(match,'save');
-                        return [match,players];
-                    }).spread(getMatchDetails)
+                        return Q.ninvoke(match,'save');
+                    }).then(getMatchDetails)
             })
-
         });
 
-        Q.all(promises).then(deferred.resolve).fail(deferred.reject);
+        Q.all(promises).then(function(matches){
+            deferred.resolve(_.filter(matches,function(match){return match ? true:false;}));
+        }).fail(deferred.reject);
     });
     return deferred.promise;
 }
 
-function getMatchDetails(match,players){
+function getMatchDetails(match){
+    if(!match){
+        return;
+    }
     var dota2Api = init();
         if(!match.details){
         var deferred = Q.defer();
@@ -76,7 +97,7 @@ function getMatchDetails(match,players){
            if(err) {
                deferred.reject(err);
                return;
-           };
+           }
             deferred.resolve(response);
         });
          return deferred.promise.then(function(response) {
@@ -93,7 +114,7 @@ function getMatchDetails(match,players){
                     return response
                 });
             }).then(function(response){
-                q.map(response.players,function(player){
+                return q.map(response.players,function(player){
                     if (player.player_slot < 5) {
                         //radiant
                         player.radiant =true;
@@ -122,33 +143,38 @@ function getMatchDetails(match,players){
                     };
                     var items=[];
                     for (var i = 0; i < 6; i++) {
-                        items.push(Item.findOne({item_id:player['item_'+i]}));
+                        items.push(Item.findOne({item_id:player['item_'+i].toString()}));
                     }
                     return Hero.findOne({hero_id:player.hero_id})
                         .then(function(hero){
                             playerdetails.hero =hero.id;
 
                             var steam_id = big(player.account_id).add("76561197960265728").toString();
-                            var playerDb=_.find(players,{steam_id:steam_id});
-                            playerdetails.player =playerDb.id;
+                            return Player.findOne({steam_id:steam_id}).then(function(playerDb){
+                                playerdetails.player =playerDb.id;
+                                return Matchplayerdetails.create(playerdetails);
+                            })
 
-                            return Matchplayerdetails.create(playerdetails);
                         }).then(function(playerdetails){
+                            if(!playerdetails){
+                                throw new Error("Dota2Api: playerdetails of "+match.match_id +
+                                    " is " +playerdetails)
+                            }
                             return Q.all(items).then(function(items){
                                 _.map(items,function(item){
+                                    if(!item)return;
                                     playerdetails.items.add(item.id)
                                 });
                                 match.playerdetails.add(playerdetails.id);
                                 return Q.ninvoke(playerdetails,'save');
                             })
-
                         });
 
                 }).then(function(){
                     return match;
                 })
 
-            }).then(function(match){
+            }).then(function(){
                 return Q.ninvoke(match, 'save');
             })
     }else {
