@@ -26,7 +26,9 @@ module.exports.bootstrap = function (cb) {
     }));
     promises.push(setupItems().then(addItemWeight));
     promises.push(Player.findOrCreate({steam_id:"76561202255233023"},{steam_id:"76561202255233023"}));
-    Q.all(promises).then(function(){cb();}).fail(cb);
+    Q.all(promises).then(function(){
+        cb()
+        ;}).fail(cb);
 
 
     // It's very important to trigger this callack method when you are finished

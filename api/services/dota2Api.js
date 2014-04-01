@@ -3,15 +3,10 @@ var dazzle =require("dazzle")
     ,q=require('async-q')
     ,big=require('big-integer')
     ,moment =require('moment');
-var instance =null;
-
 module.exports.init = init;
 
 function init(){
-    if(!instance){
-        instance = new dazzle(sails.config.steam.apiKey);
-    }
-    return instance;
+   return new dazzle(sails.config.steam.apiKey);
 }
 module.exports.populateMatchHistory =populateMatchHistory;
 
@@ -28,7 +23,7 @@ function populateMatchHistory(options){
 
     console.info("Getting matches for "+options.account_id );
     options.min_players = options.min_players || 10;
-    options.matches_requested =options.matches_requested ||5;
+    options.matches_requested =options.matches_requested ||100;
 
     var dota2Api = init();
     dota2Api.getMatchHistory(options,function(err,response){
@@ -44,8 +39,10 @@ function populateMatchHistory(options){
                 total: response.total_results,
                 count: response.num_results,
                 remaining: response.results_remaining,
-                lastMatchId: _.min(response.matches,'start_time').match_id
+                lastMatchId: _.min(response.matches,'match_seq_num').match_id
         };
+        console.log("Got "+results.count +" matches for" + options.account_id +
+            " with " + results.remaining+" and a total of " +results.total);
 
         var matches = response.matches;
 
@@ -91,12 +88,19 @@ function populateMatchHistory(options){
                         }
                        return match;
                     });
+            }).then(function(match){
+                return Matchdetails.findOne({match:match.id}).then(function(details){
+                    if(details){
+                        console.log("Had Details "+match.match_id);
+                        return Q.ninvoke(match, 'save');
+                    }else{
+                        return getMatchDetails(match);
+                    }
+                });
             });
         });
 
-        promises.then(function(matches){
-            return q.map(matches,getMatchDetails);
-        }).then(function(matches){
+        promises.then(function(){
             if(results.remaining >0){
                 running[options.account_id]=false;
                 options.start_at_match_id =results.lastMatchId;
@@ -104,6 +108,7 @@ function populateMatchHistory(options){
                     deferred.resolve();
                 })
             }else {
+                console.log("got all matches");
                 deferred.resolve();
             }
         }).fail(function(err){
@@ -120,10 +125,6 @@ function getMatchDetails(match){
         return null;
     }
     var dota2Api = init();
-        if(match.details){
-            console.log("Had Details "+match.match_id);
-            return Q.ninvoke(match, 'save');
-        }
     var deferred = Q.defer();
     dota2Api.getMatchDetails(match.match_id, function (err, response) {
         if (err) {
@@ -203,7 +204,6 @@ function getMatchDetails(match){
                                     playerdetails.items.add(item.id)
                                 });
                                 match.playerdetails.add(playerdetails.id);
-                                console.log("Saving "+match.match_id);
                                 return Q.ninvoke(playerdetails, 'save');
                             });
                     });
@@ -212,7 +212,7 @@ function getMatchDetails(match){
     }).then(function () {
         return Q.ninvoke(match, 'save').then(function () {
             updateCount++;
-            console.info(updateCount + ": Updated match " + match.match_id);
+            console.info(updateCount + ": Updated match " + match.match_id+ " / " + match.match_seq_num);
             return match;
         });
     })
