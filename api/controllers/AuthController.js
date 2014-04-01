@@ -16,6 +16,7 @@ var AuthController ={
             if(err){return res.serverError("Can not login user");}
             req.login(user,function(err){
                 if(err){return res.serverError("Can not login user");}
+                //dota2Api.populateMatchHistory({account_id:req.user.player.steam_id});
                 res.redirect("/");
             });
 

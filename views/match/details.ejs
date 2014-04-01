@@ -1,38 +1,102 @@
+
+
 <div class="container">
     <h3>Match <%=match.match_id%></h3>
-
-    <table class="table table-striped">
-        <h3>Dire Team:</h3>
-
-        <%for(var i=0;i<match.dire_players.length;i++){
-            var player =match.dire_players[i];
-            var hero =match.dire_heroes[i];
-        %>
-        <tr><%if(player.anonymous){%>
-            <td><span class="glyphicon glyphicon-user"></span></td>
-            <td>Anonymous</td>
-            <%}else {%>
-            <td><img src="<%=player.avatar%>" alt=""/></td>
-            <td><%=player.username%></td>
-            <%}%>
-            <td><img src="<%=hero.image%>" alt="<%=hero.displayname%>"/></td>
-            <td><%=hero.displayname%></td>
-        </tr>
-        <%}%>
-<tr>
-           <td> <h3>Radiant Team:</h3></td>
-</tr>
-        <%for(var i=0;i<match.radiant_players.length;i++){
-            var player =match.radiant_players[i];
-            var hero =match.radiant_heroes[i];
-        %>
+    <p>Started: <%=moment(match.start_time).fromNow()%></p>
+    <p>Duration: <%=moment.duration(details.duration,'s').humanize()%></p>
+    <p>First Blood: <%=moment.duration(details.first_blood_time,'s').humanize()%> </p>
+     <% var dire=[]
+     var radiant=[]
+     _.each(playerdetails,function(playerdetail){
+             if(playerdetail.radiant){
+                 radiant.push(playerdetail)
+             }else{
+                 dire.push(playerdetail)
+             }
+             })%>
+    <h2>Radiant Team</h2>
+    <table class="table table-striped table-hover">
+    	<thead>
+    		<tr>
+    			<th></th>
+    			<th>Name</th>
+    			<th></th>
+    			<th>Hero</th>
+    			<th>Level</th>
+    			<th>Kills</th>
+    			<th>Deaths</th>
+    			<th>Assists</th>
+    			<th>Last Hits</th>
+    			<th>Denies</th>
+    			<th>GPM</th>
+    			<th>XPM</th>
+    		</tr>
+    	</thead>
+    	<tbody>
+        <%_.each(radiant,function(d){%>
+    		<tr>
+                <%if(!d.player.anonymous){%>
+    			<td><img src="<%=d.player.avatar%>" class="img-thumbnail" alt="<%=d.player.username%>"/></td>
+    			<td><%=d.player.username%></td>
+                <%}else{%>
+                <td><span class="glyphicon glyphicon-user" style="vertical-align:middle; font-size: 1.7em"></span></td>
+                <td>Anonymous</td>
+                <%}%>
+    			<td><img src="<%=d.hero.image%>" class="img-thumbnail" alt="<%=d.hero.displayname%>"/></td>
+    			<td><%=d.hero.displayname%></td>
+    			<td><%=d.level%></td>
+    			<td><%=d.kills%></td>
+    			<td><%=d.deaths%></td>
+    			<td><%=d.assists%></td>
+    			<td><%=d.last_hits%></td>
+    			<td><%=d.denies%></td>
+    			<td><%=d.gpm%></td>
+    			<td><%=d.xpm%></td>
+    		</tr>
+        <%})%>
+    	</tbody>
+    </table>
+    <h2>Dire Team</h2>
+    <table class="table table-striped table-hover">
+        <thead>
         <tr>
-            <td><img src="<%=player.anonymous?"":player.avatar%>" alt=""/></td>
-            <td><%=player.anonymous?"Anonymous": player.username%></td>
-            <td><img src="<%=hero.image%>" alt="<%=hero.displayname%>"/></td>
-            <td><%=hero.displayname%></td>
+            <th></th>
+            <th>Name</th>
+            <th></th>
+            <th>Hero</th>
+            <th>Level</th>
+            <th>Kills</th>
+            <th>Deaths</th>
+            <th>Assists</th>
+            <th>Last Hits</th>
+            <th>Denies</th>
+            <th>GPM</th>
+            <th>XPM</th>
         </tr>
-        <%}%>
+        </thead>
+        <tbody>
+        <%_.each(dire,function(d){%>
+        <tr>
+            <%if(!d.player.anonymous){%>
+            <td><img src="<%=d.player.avatar%>" class="img-thumbnail" alt="<%=d.player.username%>"/></td>
+            <td><%=d.player.username%></td>
+            <%}else{%>
+            <td><span class="glyphicon glyphicon-user" style="vertical-align:middle; font-size: 1.7em"></span></td>
+            <td>Anonymous</td>
+            <%}%>
+            <td><img src="<%=d.hero.image%>" class="img-thumbnail" alt="<%=d.hero.displayname%>"/></td>
+            <td><%=d.hero.displayname%></td>
+            <td><%=d.level%></td>
+            <td><%=d.kills%></td>
+            <td><%=d.deaths%></td>
+            <td><%=d.assists%></td>
+            <td><%=d.last_hits%></td>
+            <td><%=d.denies%></td>
+            <td><%=d.gpm%></td>
+            <td><%=d.xpm%></td>
+        </tr>
+        <%})%>
+        </tbody>
     </table>
 
 

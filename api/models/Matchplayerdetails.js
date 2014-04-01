@@ -11,7 +11,7 @@ module.exports = {
         match:{model: 'match'},
         player:{model:'player'},
         items:{collection:'item',via:'playerdetails', dominant:true},
-        radiant:'bool',
+        radiant:'boolean',
         hero:{model:'hero'},
         kills:'integer',
         deaths:'integer',

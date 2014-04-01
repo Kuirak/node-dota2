@@ -8,8 +8,8 @@
 module.exports = {
 
 	attributes: {
-        match:{model:'match'},
-        radiant_win:'bool',
+        match:{model:'match',unique:true},
+        radiant_win:'boolean',
         duration:'integer',
         first_blood_time:'integer',
         game_mode:'integer', //convert to enum
