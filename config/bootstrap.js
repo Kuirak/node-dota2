@@ -19,6 +19,11 @@ var passport = require('passport')
  */
 
 module.exports.bootstrap = function (cb) {
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+
+    _.mixin({ 'capitalize': capitalize });
     setupPassport();
     var promises =[];
     promises.push(setupHeroes().then(function(heroes){
@@ -133,9 +138,12 @@ function addItemWeight(items ,heroes){
                        }else{
                             return Roleweight.create(current);
                        }
-                   }).then(function(weight){
+                   }).spread(function(weight){
                        if(!weight){
                            throw new Error("No Roleweight found or created");
+                       }
+                       if(weight === null){
+                           console.log("weight is null "+ item.id);
                        }
                        if(heroes){
                            return Hero.update({id:item.id},{roleweight:weight.id})

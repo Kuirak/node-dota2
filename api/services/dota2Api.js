@@ -31,7 +31,11 @@ function populateMatchHistory(options){
             deferred.reject(err);
             return;
         }
-        if(response.status !== 1){
+        if(!response){
+            deferred.reject(new Error("Dota2Api: No response "));
+            return;
+        }
+        if( response.status !== 1 ){
             deferred.reject(new Error("Dota2Api: StatusCode " +response.status+" - "+ response.statusDetail));
             return;
         }

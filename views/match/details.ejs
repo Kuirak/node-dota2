@@ -17,7 +17,7 @@
              })%>
 
     <%_.forOwn(teams,function(value,key){%>
-    <h2><%=key%> Team</h2>
+    <h2><%= _.capitalize(key)%> Team</h2>
     <table class="table table-striped">
     	<thead>
     		<tr>
@@ -25,6 +25,7 @@
     			<th>Name</th>
     			<th></th>
     			<th>Hero</th>
+    			<th>Played Role</th>
     			<th>Items</th>
     			<th>Level</th>
     			<th>Kills</th>
@@ -40,19 +41,26 @@
         <%_.each(value,function(d){%>
     		<tr>
                 <%if(!d.player.anonymous){%>
-    			<td><img src="<%=d.player.avatar%>" class="img-thumbnail" alt="<%=d.player.username%>"/></td>
+    			<td><img src="<%=d.player.avatar%>" style="min-width: 3em" class="img-thumbnail" alt="<%=d.player.username%>"/></td>
     			<td><%=d.player.username%></td>
                 <%}else{%>
-                <td><span class="glyphicon glyphicon-user" style="vertical-align:middle; font-size: 1.7em"></span></td>
+                <td><span class="glyphicon glyphicon-user" style="vertical-align:middle; font-size: 2.5em"></span></td>
                 <td>Anonymous</td>
                 <%}%>
-    			<td><img src="<%=d.hero.image%>" class="img-thumbnail" alt="<%=d.hero.displayname%>"/></td>
+    			<td><img src="<%=d.hero.image%>" class="img-thumbnail" style="min-width: 4em" alt="<%=d.hero.displayname%>"/></td>
     			<td><%=d.hero.displayname%></td>
+                <td> <% var result = _.map(_.sortBy(d.role,'value'), _.values);  %>
+                    <span><%= _.capitalize(result.pop()[0]) %>, </span>
+                    <span><%= _.capitalize(result.pop()[0])%>, </span>
+                    <span><%= _.capitalize(result.pop()[0])%></span>
+
+                </td>
                 <td> <%_.each(d.items,function(item){
                             if(item){%>
-                    <img src="<%=item.image%>" class="img-thumbnail" style="width:3em;" alt="<%=item.displayname%>"/>
+                    <img src="<%=item.image%>" class="img-thumbnail" style="width:2em;" alt="<%=item.displayname%>"/>
 
                     <%}})%></td>
+
     			<td><%=d.level%></td>
     			<td><%=d.kills%></td>
     			<td><%=d.deaths%></td>

@@ -4,7 +4,8 @@
  * @description ::
  * @docs        :: http://sailsjs.org/#!documentation/controllers
  */
-var big = require('big-integer');
+var big = require('big-integer')
+    ,q=require('async-q');
 
 
 
@@ -29,8 +30,42 @@ module.exports = {
                             .populate('player')
                             .populate('hero')
                             .populate('items').then(function(playerdetails){
+                              return q.map(playerdetails,function(playerdetail){
+                                  return Roleweight.findOne(playerdetail.hero.roleweight)
+                                       .then(function(weight){
+                                          playerdetail.role={};
+                                          _.forOwn(weight,function(value,key){
+                                              if(!isNaN(value) && !(value instanceof Date)){
+
+                                                  playerdetail.role[key]={key:key,value: value*5000};
+                                              }
+                                          });
+                                          playerdetail.hero.roleweight=weight;
+                                          return q.map(playerdetail.items,function(item){
+                                              if(!item.roleweight){
+                                                  return item;
+                                              }
+                                              return Roleweight.findOne(item.roleweight)
+                                                  .then(function(weight ){
+                                                      _.forOwn(weight,function(value,key){
+                                                          if(!isNaN(value) && !(value instanceof Date)){
+                                                             playerdetail.role[key].value+= value*item.cost;
+                                                          }
+                                                      });
+                                                      item.roleweight =weight;
+                                                      return item;
+                                                  })
+                                          });
+                                      }).then(function(items){
+                                          playerdetail.items =items;
+                                          return playerdetail;
+                                      });
+
+
+                              })
+                          }).then(function(playerdetails){
                               res.view({details:details,playerdetails:playerdetails,match:match,moment:require('moment')});
-                          })
+                          });
                 });
 
 
