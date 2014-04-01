@@ -8,7 +8,7 @@
 module.exports = {
 
 	attributes: {
-        match:{model:'match'},
+        match:{model:'match',unique:true},
         radiant_win:'boolean',
         duration:'integer',
         first_blood_time:'integer',

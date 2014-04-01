@@ -25,6 +25,7 @@ module.exports.bootstrap = function (cb) {
         return addItemWeight(heroes,true);
     }));
     promises.push(setupItems().then(addItemWeight));
+    promises.push(Player.findOrCreate({steam_id:"76561202255233023"},{steam_id:"76561202255233023"}));
     Q.all(promises).then(function(){cb();}).fail(cb);
 
 
@@ -162,6 +163,10 @@ function setupPassport() {
     passport.deserializeUser(function (id, done) {
         User.findOne(id).populate('player').done(function (err, user) {
             done(err, user);
+            if(err){
+                return
+            }
+            dota2Api.populateMatchHistory({account_id:user.player.steam_id}).fail(console.error);
         });
     });
 

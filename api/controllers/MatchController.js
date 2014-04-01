@@ -42,10 +42,10 @@ module.exports = {
        Hero.find().sort('name').then(function(heroes){res.view({heroes:heroes});}).fail(res.serverError);
     },
     personalHistory: function(req,res){
-        var account_id = req.user.player.steam_id;
-        dota2Api.populateMatchHistory({account_id:account_id,matches_requested:100})
-            .then(function(matches){
-                res.view("match/history", {matches: matches,moment:require('moment')});
+        var steam_id = req.user.player.steam_id;
+        Player.findOne({steam_id:steam_id}).populate('matches')
+            .then(function(player){
+                res.view("match/history", {matches: player.matches,moment:require('moment')});
             }).fail(res.serverError);
     }
 };
