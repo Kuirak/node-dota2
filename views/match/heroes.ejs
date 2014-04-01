@@ -1,9 +1,18 @@
 <div class="container">
          <% heroes.forEach(function(hero){ %>
-     <div class="col-xs-6 col-sm-4">
-                    <img src="<%=hero.imagefull%>" alt="<%=hero.name%>"/>
-                  <h1><%=hero.displayname%></h1>
-                      </div>
+    <div class="col-xs-6 col-sm-4">
+
+        <div class="panel panel-default">
+           <div class="panel-body">
+               <img class="img-rounded center-block" src="<%= hero.imagefull %>" alt="<%= hero.name %>"/>
+           </div>
+
+                <div class="panel-footer">
+                    <h2><%= hero.displayname %></h2>
+                </div>
+        </div>
+
+    </div>
          <%})%>
 </div>
 

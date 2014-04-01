@@ -10,13 +10,6 @@ var big = require('big-integer')
 
 
 module.exports = {
-	getMatch: function(req,res){
-        var match_id=req.params.match_id;
-        dota2Api().getMatchDetails(match_id,function(err,response){
-            if(err) res.send(500);
-            res.view({match:response})
-        })
-    },
     details:function(req,res){
         var match_id=parseInt(req.params.match_id);
         Match.findOne({match_id:match_id})
@@ -77,9 +70,11 @@ module.exports = {
     },
     personalHistory: function(req,res){
         var steam_id = req.user.player.steam_id;
-        Player.findOne({steam_id:steam_id}).populate('matches')
+        var page =parseInt(req.param('page')) ||0;
+        var limit= 9;
+        Player.findOne({steam_id:steam_id}).populate('matches',{skip:page*limit,limit:limit})
             .then(function(player){
-                res.view("match/history", {matches: player.matches,moment:require('moment')});
+                res.view("match/history", {page:page,matches: player.matches,moment:require('moment')});
             }).fail(res.serverError);
     }
 };

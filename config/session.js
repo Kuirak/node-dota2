@@ -43,12 +43,12 @@ module.exports.session = {
 
 
   // Uncomment the following lines to use your Mongo adapter as a session store
-  adapter: 'mongo',
-
-  host: 'localhost',
-  port: 27017,
-  db: 'sails',
-  collection: 'sessions',
+//  adapter: 'mongo',
+//
+//  host: 'localhost',
+//  port: 27017,
+//  db: 'node-dota2',
+//  collection: 'sessions',
   //
   // Optional Values:
   //
@@ -60,5 +60,12 @@ module.exports.session = {
   // auto_reconnect: false,
   // ssl: false,
   // stringify: true
+    adapter   :'mongo',
+    host      : require('./local').mongo.host,
+    port      : require('./local').mongo.port,
+    username  : require('./local').mongo.user,
+    password  : require('./local').mongo.password,
+    collection: 'sessions',
+    db        : 'node-dota2'
 
 };

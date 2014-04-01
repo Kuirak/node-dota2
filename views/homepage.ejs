@@ -6,16 +6,10 @@
     <%if(!req.user){%>
     <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
     <%}else{%>
-    <p>Steam ID: <%=req.user.player.steam_id%></p>
-   <div class=""> <img src="<%=req.user.player.avatarfull%>"/>
+    <img src="<%=req.user.player.avatarfull%>"/>
 
-   </div>
-    <div class="row"></div>
-    <div>
-        <a class="btn-primary btn" href="match/personalhistory">My Matches</a>
-        <a class="btn-primary btn" href="match/history">All Matches</a>
 
-    </div>
+
     <%}%>
 
 

@@ -32,54 +32,50 @@
     <link rel="stylesheet" href="/styles/bootstrap-theme.css">
     <link rel="stylesheet" href="/styles/bootstrap.css">
     <link rel="stylesheet" href="/styles/importer.css">
+    <link rel="stylesheet" href="/styles/styles.css">
     <!--STYLES END-->
   </head>
 
   <body>
-  <nav class="navbar navbar-inverse navbar">
-  	<a class="navbar-brand" href="#"></a>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+
+
+  	<a class="navbar-brand" href="/">Dota 2 Stats</a>
   	<ul class="nav navbar-nav">
         <%if (req.user){%>
-        <li class="active">
-            <a href="http://localhost:1337/">Home</a>
-        </li>
-        <li class="active">
-  			<a href="/match/personalhistory">My history</a>
+        <li>
+  			<a href="/match/personalhistory">My History</a>
   		</li><%}%>
   		<li>
   			<a href="/item/all">Items</a>
   		</li>
         <li>
-  			<a href="/match/heroes">heroes</a>
+  			<a href="/match/heroes">Heroes</a>
   		</li>
 
   	</ul>
 
     <ul class="nav navbar-nav navbar-right">
-        <%if(!req.user){%>
-        <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
-        <%}else{%>
+        <%if(req.user){%>
         <a class="btn btn-success" href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a>
-
-
-        <div class="row"></div>
-
         <%}%>
 
     </ul>
+      </div>
   </nav>
 
     <%- body %>
 <nav class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
-	<a class="navbar-brand" href="#">privacy</a>
-	<ul class="nav navbar-nav">
+    <div class="container">
+        <a class="navbar-brand" href="/privacy">privacy</a>
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="/about">About</a>
+            </li>
+        </ul>
 
-		<li>
-			<a href="#">Link</a>
-		</li>
-	</ul>
-
-
+    </div>
 </nav>
 
 
@@ -135,8 +131,8 @@
     <!--SCRIPTS-->
     <script src="/js/socket.io.js"></script>
     <script src="/js/sails.io.js"></script>
-    <script src="/js/connection.example.js"></script>
     <script src="/js/bootstrap.js"></script>
+    <script src="/js/jquery-2.1.0.js"></script>
     <!--SCRIPTS END-->
   </body>
 </html>

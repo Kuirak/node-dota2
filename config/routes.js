@@ -31,7 +31,8 @@ module.exports.routes = {
     },
 
     'get /logout': 'AuthController.logout',
-
+    '/privacy':{view:'privacy'},
+    '/about':{view:'about'},
 
 //    'post /auth/local': 'AuthController.callback',
 //    'post /auth/local/:action': 'AuthController.callback',
@@ -40,7 +41,7 @@ module.exports.routes = {
     'get /auth/steam/callback': 'AuthController.callback',
 
 
-    'get /match/getMatch/:match_id': 'MatchController.getMatch',
+
     'get /match/details/:match_id': 'MatchController.details',
     'get /match/history': 'MatchController.history',
     'get /match/heroes': 'MatchController.heroes',

@@ -18,7 +18,7 @@
 
     <%_.forOwn(teams,function(value,key){%>
     <h2><%= _.capitalize(key)%> Team</h2>
-    <table class="table table-striped">
+    <table class="table table-striped ">
     	<thead>
     		<tr>
     			<th></th>
@@ -44,7 +44,7 @@
     			<td><img src="<%=d.player.avatar%>" style="min-width: 3em" class="img-thumbnail" alt="<%=d.player.username%>"/></td>
     			<td><%=d.player.username%></td>
                 <%}else{%>
-                <td><span class="glyphicon glyphicon-user" style="vertical-align:middle; font-size: 2.5em"></span></td>
+                <td><span class="glyphicon glyphicon-user glyph-center" ></span></td>
                 <td>Anonymous</td>
                 <%}%>
     			<td><img src="<%=d.hero.image%>" class="img-thumbnail" style="min-width: 4em" alt="<%=d.hero.displayname%>"/></td>

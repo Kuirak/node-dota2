@@ -1,0 +1,9 @@
+body {
+      padding-top:70px;
+      padding-bottom:70px;
+}
+
+.glyph-center{
+    vertical-align:middle;
+    font-size: 2.5em;
+}

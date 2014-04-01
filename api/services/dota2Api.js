@@ -45,7 +45,7 @@ function populateMatchHistory(options){
                 remaining: response.results_remaining,
                 lastMatchId: _.min(response.matches,'match_seq_num').match_id
         };
-        console.log("Got "+results.count +" matches for" + options.account_id +
+        console.info("Got "+results.count +" matches for" + options.account_id +
             " with " + results.remaining+" and a total of " +results.total);
 
         var matches = response.matches;
@@ -95,7 +95,7 @@ function populateMatchHistory(options){
             }).then(function(match){
                 return Matchdetails.findOne({match:match.id}).then(function(details){
                     if(details){
-                        console.log("Had Details "+match.match_id);
+                        console.info("Had Details "+match.match_id);
                         return Q.ninvoke(match, 'save');
                     }else{
                         return getMatchDetails(match);
@@ -112,7 +112,7 @@ function populateMatchHistory(options){
                     deferred.resolve();
                 })
             }else {
-                console.log("got all matches");
+                console.info("got all matches");
                 deferred.resolve();
             }
         }).fail(function(err){

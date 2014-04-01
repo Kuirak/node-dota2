@@ -2,11 +2,19 @@
 
 <div class="container">
     <% matches.forEach(function(match){%>
-    <div>
-        <h2>Match <%=match.match_id%></h2>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h3>Match <%=match.match_id%></h3>
         <p>Start: <%=moment(match.start_time).fromNow()%></p>
         <p>Lobby type: <%=match.lobby_type%></p>
         <a href="details/<%=match.match_id%>"> View Details</a>
     </div>
+
     <%})%>
+
+</div>
+<div class="container navbar-fixed-bottom" style="padding-bottom: 70px">
+    <ul class="pager">
+        <li class="previous<%if(page<=0){%> disabled<%}%>"><a href="?page=<%=page <=0? 0:page-1%>" >Previous</a></li>
+        <li class="next" ><a href="?page=<%=page+1%>">Next</a></li>
+    </ul>
 </div>
