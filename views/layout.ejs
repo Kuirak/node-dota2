@@ -36,8 +36,51 @@
   </head>
 
   <body>
-    <%- body %>
+  <nav class="navbar navbar-inverse navbar">
+  	<a class="navbar-brand" href="#"></a>
+  	<ul class="nav navbar-nav">
+        <%if (req.user){%>
+        <li class="active">
+            <a href="http://localhost:1337/">Home</a>
+        </li>
+        <li class="active">
+  			<a href="/match/personalhistory">My history</a>
+  		</li><%}%>
+  		<li>
+  			<a href="/item/all">Items</a>
+  		</li>
+        <li>
+  			<a href="/match/heroes">heroes</a>
+  		</li>
 
+  	</ul>
+
+    <ul class="nav navbar-nav navbar-right">
+        <%if(!req.user){%>
+        <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
+        <%}else{%>
+        <a class="btn btn-success" href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a>
+
+
+        <div class="row"></div>
+
+        <%}%>
+
+    </ul>
+  </nav>
+
+    <%- body %>
+<nav class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
+	<a class="navbar-brand" href="#">privacy</a>
+	<ul class="nav navbar-nav">
+
+		<li>
+			<a href="#">Link</a>
+		</li>
+	</ul>
+
+
+</nav>
 
 
     <!--
@@ -62,7 +105,7 @@
     -->
 
     <!--TEMPLATES-->
-
+    
     <!--TEMPLATES END-->
 
 
@@ -92,6 +135,7 @@
     <!--SCRIPTS-->
     <script src="/js/socket.io.js"></script>
     <script src="/js/sails.io.js"></script>
+    <script src="/js/connection.example.js"></script>
     <script src="/js/bootstrap.js"></script>
     <!--SCRIPTS END-->
   </body>

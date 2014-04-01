@@ -6,7 +6,6 @@
     <%if(!req.user){%>
     <a  href="auth/login"><img src="images/sits_large_border.png" alt="Sign on with Steam" ></a>
     <%}else{%>
-    <a class="btn btn-success" href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a>
     <p>Steam ID: <%=req.user.player.steam_id%></p>
    <div class=""> <img src="<%=req.user.player.avatarfull%>"/>
 
@@ -20,11 +19,7 @@
     <%}%>
 
 
-    <div class="row">
-        <a class="btn-default btn" href="item/all"> Show Dota 2 Items</a>
-        <a class="btn-default btn" href="match/heroes">Show Dota 2 Heroes</a>
 
-    </div>
 
 
 
