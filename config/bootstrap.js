@@ -134,13 +134,13 @@ function addItemWeight(items ,heroes){
                    Roleweight.findOne({name:current.name})
                    .then(function(weight){
                        if(weight){
-                           return Roleweight.update({id:weight.id},current);
+                           return Roleweight.update({id:weight.id},current).then(function(weights){return weights[0];});
                        }else{
                             return Roleweight.create(current);
                        }
-                   }).spread(function(weight){
+                   }).then(function(weight){
                        if(!weight){
-                           throw new Error("No Roleweight found or created");
+                          throw new Error("No Roleweight found or created " +item.name);
                        }
                        if(weight === null){
                            console.log("weight is null "+ item.id);
@@ -154,9 +154,8 @@ function addItemWeight(items ,heroes){
 
                         return item;
                    }));
-            }else{
-                throw new Error("Item not found " + obj.crow.name);
             }
+
         });
         csvParser.on("end",function(obj){
             Q.all(promises).then(deferred.resolve).fail(deferred.reject);
@@ -171,7 +170,7 @@ function setupPassport() {
     });
 
     passport.deserializeUser(function (id, done) {
-        User.findOne(id).populate('player').done(function (err, user) {
+        User.findOne(id).populate('player').exec(function (err, user) {
             done(err, user);
             if(err){
                 return

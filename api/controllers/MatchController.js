@@ -19,6 +19,9 @@ module.exports = {
             .then(function(match){
                return Matchdetails.findOne({match: match.id})
                     .then(function(details){
+                       if(!details){
+                           throw Error("No Matchdetails");
+                       }
                       return  Matchplayerdetails.find({match:match.id})
                             .populate('player')
                             .populate('hero')

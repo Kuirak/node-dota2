@@ -160,7 +160,7 @@ function getMatchDetails(match){
                     //dire
                     player.radiant = false;
                 }
-                var playerdetails = {
+                var playerdetail = {
                     match: match.id,
                     radiant: player.radiant,
                     kills: player.kills,
@@ -182,35 +182,38 @@ function getMatchDetails(match){
                 for (var i = 0; i < 6; i++) {
                     items.push(Item.findOne({item_id: player['item_' + i].toString()}));
                 }
-                //Get Hero id
-                return Hero.findOne({hero_id: player.hero_id})
-                    .then(function (hero) {
-                        playerdetails.hero = hero.id;
-                    }).then(function(){ //Get Player id
-
+                //Get Player id
+                return Matchplayerdetails.create(playerdetail).then(function(playerdetail){
                         var steam_id = big(player.account_id).add("76561197960265728").toString();
-                        return Player.findOne({steam_id: steam_id})
-                    }).then(function (playerDb) { //Create playerdetails
-                        if(!playerDb){
-                            console.log("No player found");
-                        }
-                        playerdetails.player = playerDb.id;
-                        return Matchplayerdetails.create(playerdetails);
-                    }).then(function (playerdetails) { //get Items
-                        if (!playerdetails) {
-                            throw new Error("Dota2Api: playerdetails of " + match.match_id +
-                                " is " + playerdetails);
-                        }
-                        return Q.all(items)
-                            .then(function (items) { //Set items & save
-                                _.map(items, function (item) {
-                                    if (!item)return;
-                                    playerdetails.items.add(item.id)
-                                });
-                                match.playerdetails.add(playerdetails.id);
-                                return Q.ninvoke(playerdetails, 'save');
+                        return Player.findOne({steam_id: steam_id}).then(function (playerDb) { //Create playerdetails
+                            if(!playerDb){
+                                console.log("No player found");
+                            }
+                            playerdetail.player = playerDb.id;
+                            return playerdetail;
+                        })
+                    }).then(function (playerdetail) {
+                                //Get Hero id
+                            return  Hero.findOne({hero_id: player.hero_id})
+                                    .then(function (hero) {
+                                        playerdetail.hero = hero.id;
+                                        return playerdetail;
+                                    });
+                    }).then(function(playerdetail){//get Items
+                                if (!playerdetail) {
+                                    throw new Error("Dota2Api: playerdetails of " + match.match_id +
+                                        " is " + playerdetail);
+                                }
+                                return Q.all(items)
+                                    .then(function (items) { //Set items & save
+                                        _.map(items, function (item) {
+                                            if (!item)return;
+                                            playerdetail.items.add(item.id)
+                                        });
+                                        match.playerdetails.add(playerdetail.id);
+                                        return Q.ninvoke(playerdetail, 'save');
+                                    });
                             });
-                    });
 
             });
     }).then(function () {
