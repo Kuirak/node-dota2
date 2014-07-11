@@ -5,8 +5,6 @@
       <list>
         <ServerConfiguration>
           <option name="label" value="Local" />
-          <option name="serverName" value="localhost" />
-          <option name="serverPort" value="27017" />
         </ServerConfiguration>
       </list>
     </option>

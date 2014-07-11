@@ -30,6 +30,7 @@ module.exports.bootstrap = function (cb) {
         return addItemWeight(heroes,true);
     }));
     promises.push(setupItems().then(addItemWeight));
+    //erstellt den Anonymous Player
     promises.push(Player.findOrCreate({steam_id:"76561202255233023"},{steam_id:"76561202255233023"}));
     Q.all(promises).then(function(){
         cb()
@@ -41,6 +42,8 @@ module.exports.bootstrap = function (cb) {
 
 };
 
+//Holt die Heldendaten von der dota2Api
+//verwendet nicht den Service da Sails.js hier noch nicht ganz gestartet ist
 function setupHeroes(){
     var deferred = Q.defer();
     var dazzle =require("dazzle");
@@ -58,7 +61,7 @@ function setupHeroes(){
 
 }
 
-
+//liest die Items mit Hilfe des vdf Moduls von der items.txt ein
 function setupItems(){
     var deferred = Q.defer();
     var itemsPath = path.join(__dirname, "items.txt");
@@ -87,15 +90,24 @@ function setupItems(){
             });
         });
 
-
+        //Erstellt die Items oder updated sie
         Q.all(q.map(itemDatas,function(itemData){
-                return Item.findOrCreate({item_id: itemData.item_id}, itemData);
+                return Item.findOne({item_id: itemData.item_id}).then(function(item){
+                    if(item){
+                      return Item.update({item_id: itemData.item_id}, itemData)
+                    }else{
+                        return Item.create(itemData);
+                    }
+                });
+
             })).then(deferred.resolve);
 
     });
     return deferred.promise;
 }
 
+//Liest die Rollengewichtung ein
+//Hat einen Hero und Item mode
 function addItemWeight(items ,heroes){
         var deferred = Q.defer();
         var itemsCsvPath;

@@ -18,6 +18,7 @@ module.exports = {
         roleweight:{model:'roleweight'},
         source:'json'
 	},
+    //fügt bilder urls hinzu
     beforeCreate: function (values, done) {
         var baseUrl = "http://cdn.dota2.com/apps/dota2/images/heroes/";
         values.imagefull = baseUrl + values.name.slice("npc_dota_hero_".length) + "_full.png";

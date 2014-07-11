@@ -14,9 +14,9 @@ module.exports = {
         avatarmedium:'string',
         avatarfull:'string',
         anonymous:'bool',
-        matches:{collection:'match',via:'players'},
-
+        matches:{collection:'match',via:'players'}
 	},
+    //fügt bilder urls hinzu mit Hilfe des steamApi service
     beforeCreate: function(values,done){
         steamApi().getPlayerSummaries({
             steamids: [values.steam_id],

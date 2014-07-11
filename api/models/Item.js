@@ -14,8 +14,9 @@ module.exports = {
         name:{type:'string',unique:true},
         cost:'integer',
         playerdetails:{collection:'matchplayerdetails',via:'items'},
-        roleweight:{model:'roleweight'},
+        roleweight:{model:'roleweight'}
 	},
+    //fügt bilder urls hinzu
     beforeCreate:function(values,done){
         var base = "http://cdn.dota2.com/apps/dota2/images/items/";
         if(_.contains(values.name,"recipe")){

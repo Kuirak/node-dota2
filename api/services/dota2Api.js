@@ -8,13 +8,15 @@ module.exports.init = init;
 function init(){
    return new dazzle(sails.config.steam.apiKey);
 }
+
 module.exports.populateMatchHistory =populateMatchHistory;
 
 var running={};
 
 function populateMatchHistory(options){
-
+    //Deferred Object für die Promises
     var deferred = Q.defer();
+    //Falls bereits ein Prozess läuft fertig
     if(running[options.account_id]){
         deferred.resolve();
         return deferred.promise;
@@ -22,10 +24,13 @@ function populateMatchHistory(options){
     running[options.account_id] =true;
 
     console.info("Getting matches for "+options.account_id );
+    //Standardwerte für die options
     options.min_players = options.min_players || 10;
+    //Matches werden immer in 100 Paketen abgeholt wenn nicht anderse definiert
     options.matches_requested =options.matches_requested ||100;
 
     var dota2Api = init();
+    //Zugriff auf die WebAPI um die Match History zu holen
     dota2Api.getMatchHistory(options,function(err,response){
         if(err) {
             deferred.reject(err);
@@ -49,14 +54,17 @@ function populateMatchHistory(options){
             " with " + results.remaining+" and a total of " +results.total);
 
         var matches = response.matches;
-
+        //für alle matches:
         var promises = q.map(matches,function(match){
             if(match.lobby_type <0){
                 deferred.reject(new Error("Dota2Api: Invalid Lobbytype"));
                 return
-            }if(match.lobby_type >0 && match.lobby_type <5){
+            }
+            //Prüfen ob der Lobby type stimmt damit  keine Bot oder sonstigen Sonderspiele mit reingezählt werden
+            if(match.lobby_type >0 && match.lobby_type <5){
                 return null;
             }
+            //Konvertieren der unix seconds time in moment.js time.
             var start_time = moment.unix(match.start_time);
 
             var matchData={
@@ -65,8 +73,11 @@ function populateMatchHistory(options){
               lobby_type:match.lobby_type,
               start_time: start_time.toDate()
             };
+            //Reduzieren der player ids  auf unique account_ids da alle die ihr
+            //Profil auf privat gestellt haben die selbe account_id haben
             var players = _.uniq(match.players,'account_id');
             return q.map(players,function(player){
+                // erstellen oder finden des Playermodells
                 var steam_id = big(player.account_id).add("76561197960265728").toString();
                 return Player.findOne({steam_id: steam_id}).then(function(player){
                     if(player){
@@ -78,6 +89,8 @@ function populateMatchHistory(options){
                     }
                 });
             }).then(function(players){
+                //erstellen oder finden des Matches.
+                //falls keine Spieler vorhanden sind füge die Spieler hinzu
                 return Match.findOrCreate({match_id:match.match_id},matchData)
                     .populate('players')
                     .populate('details')
@@ -93,6 +106,9 @@ function populateMatchHistory(options){
                        return match;
                     });
             }).then(function(match){
+                //prüfen ob bereits Matchdetails vorhanden sind
+                // wenn ja, dann match speichern
+                // ansonsten neue von der dota2api holen
                 return Matchdetails.findOne({match:match.id}).then(function(details){
                     if(details){
                         console.info("Had Details "+match.match_id);
@@ -104,6 +120,7 @@ function populateMatchHistory(options){
             });
         });
 
+        //Wenn alle Matches fertig sind running auf false und neustarten bis es keine Matches mehr gibt.
         promises.then(function(){
             if(results.remaining >0){
                 running[options.account_id]=false;
@@ -124,6 +141,7 @@ function populateMatchHistory(options){
 }
 
 var updateCount=0;
+//Holt die Matchdetails und speichert diese in die Datenbank oder updated das Match
 function getMatchDetails(match){
     if(!match){
         return null;
