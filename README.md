@@ -26,7 +26,7 @@
 	Wenn das nicht geht ```node app.js```  probieren
 
 
-Der Prototyp verwendet ein Steamkonto. Wir haben ein Testkonto unter  ```xyz``` Pw: ```asdf```  aufgesetzt.
+Der Prototyp verwendet ein Steamkonto. Um Spiele zu sehen müssen auch Matches im offiziellen Dota 2 Matchmaking ausgetragen worden sein.
 
 
 
