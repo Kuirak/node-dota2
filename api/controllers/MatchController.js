@@ -36,9 +36,6 @@ module.exports = {
             }).fail(res.serverError);
     },
 
-    heroes:function(req,res){
-       Hero.find().sort('name').then(function(heroes){res.view({heroes:heroes});}).fail(res.serverError);
-    },
     personalHistory: function(req,res){
         var steam_id = req.user.player.steam_id;
         var page =parseInt(req.param('page')) ||0;

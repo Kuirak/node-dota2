@@ -1,0 +1,64 @@
+<div class="container">
+    <ul class="list-group">
+
+        <% items.forEach(function(item){%>
+        <li class="list-group-item">
+            <h3><%= item.displayname%></h3>
+            <%if(item.imagemedium){%>
+            <img src="<%=item.imagemedium%>" alt=""/>
+            <%}else{%>
+            <img src="<%=item.image%>" alt=""/>
+            <%}%>
+
+
+            <p><%if(item.cost){%>Gold: <%=item.cost%>  <%}%></p>
+
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <%
+                        var values=[];
+
+                            _.forOwn(item.roleweight,function(value,key){
+                        if(key==='id'||key==='createdAt'||key==='updatedAt'||key==='name'){
+                            return;
+                        }
+                        values.push(value);
+                    %>
+
+                    <th><%= _.capitalize(key)%></th>
+
+                    <%});%>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <%_.each(values,function(val){%>
+
+                    <td><%=val%></td>
+
+                    <%});%>
+                </tr>
+                </tbody>
+            </table>
+
+
+        </li>
+        <%});%>
+    </ul>
+
+</div>
+<div class="container">
+    <% items.forEach(function(item){ %>
+    <div class="col-xs-6 col-sm-4">
+        <h1><%=item.displayname%></h1>
+        <%if(item.cost){%>
+        <p>Gold: <%=item.cost%></p>
+       <%}%>
+
+        <img src="<%=item.image%>" alt="<%=item.displayname%>"/>
+    </div>
+    <%});%>
+
+</div>

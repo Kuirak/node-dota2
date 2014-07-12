@@ -27,14 +27,10 @@ var jsFilesToInject = [
   // linked in the proper order order
 
   // Bring in the socket.io client
-  'js/socket.io.js',
+  'js/jquery-2.1.0.js',
 
   // then beef it up with some convenience logic for talking to Sails.js
-  'js/sails.io.js',
-
-  // finally, include a simple boilerplate script that connects a socket
-  // to the Sails backend with some example code
-  'js/connection.example.js',
+  'js/bootstrap.js',
 
   //
   // *->    you might put other dependencies like jQuery or Angular here   <-*

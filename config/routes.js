@@ -43,9 +43,7 @@ module.exports.routes = {
 
 
     'get /match/details/:match_id': 'MatchController.details',
-    'get /match/history': 'MatchController.history',
-    'get /match/heroes': 'MatchController.heroes',
-    'get /match/personalhistory': 'MatchController.personalHistory',
+    'get /match/personalhistory': 'MatchController.personalHistory'
 
 
 

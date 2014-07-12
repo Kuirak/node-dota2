@@ -12,7 +12,7 @@ var fs =require('fs')
 module.exports = {
 	all:function(req,res){
         Item.find().populate('roleweight').sort('name').then(function(items){
-            res.view({items:items});
+            res.view('heroes_items',{items:items});
         }).fail(res.serverError);
     }
 
