@@ -52,8 +52,19 @@ function setupHeroes(){
             if(err)return deferred.reject(err);
             var promises =[];
             _.each(response.heroes,function(hero){
-               promises.push( Hero.findOrCreate({hero_id: hero.id},{hero_id: hero.id,displayname:hero.localized_name,name:hero.name})
-                    .then(function(hero){return hero;}));
+
+               promises.push(Hero.findOne({hero_id:hero.id})
+                   .then(function(heroDB){
+                       if(heroDB){
+                           return Hero.update({hero_id:hero.id},{hero_id: hero.id,displayname:hero.localized_name,name:hero.name})
+                               .then(function(updatedHeroes){
+                                    return updatedHeroes[0];
+                               })
+                       }else{
+                           return Hero.create({hero_id: hero.id,displayname:hero.localized_name,name:hero.name})
+                               .then(function(hero){return hero;})
+                       }
+               }));
             });
             Q.all(promises).then(deferred.resolve).fail(deferred.reject);
         });
@@ -95,6 +106,9 @@ function setupItems(){
                 return Item.findOne({item_id: itemData.item_id}).then(function(item){
                     if(item){
                       return Item.update({item_id: itemData.item_id}, itemData)
+                          .then(function(items){
+                          return items[0];
+                          })
                     }else{
                         return Item.create(itemData);
                     }
