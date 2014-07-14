@@ -21,7 +21,7 @@
                         var values=[];
 
                             _.forOwn(item.roleweight,function(value,key){
-                        if(key==='id'||key==='createdAt'||key==='updatedAt'||key==='name'){
+                        if(key==='id'||key==='createdAt'||key==='updatedAt'||key==='name'|| key ==='inspect'){
                             return;
                         }
                         values.push(value);
@@ -47,18 +47,5 @@
         </li>
         <%});%>
     </ul>
-
-</div>
-<div class="container">
-    <% items.forEach(function(item){ %>
-    <div class="col-xs-6 col-sm-4">
-        <h1><%=item.displayname%></h1>
-        <%if(item.cost){%>
-        <p>Gold: <%=item.cost%></p>
-       <%}%>
-
-        <img src="<%=item.image%>" alt="<%=item.displayname%>"/>
-    </div>
-    <%});%>
 
 </div>
